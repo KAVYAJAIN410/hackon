@@ -1,0 +1,212 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id          String   @id @map("id")
+  name        String
+  category    String
+  brand       String?
+  mrp         Decimal  @db.Decimal(10, 2)
+  imageUrl    String?  @map("image_url")
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  orders         Order[]
+  inventoryItems InventoryItem[]
+
+  @@map("products")
+}
+
+model User {
+  id           String   @id @map("id")
+  name         String
+  email        String   @unique
+  city         String
+  state        String
+  greenCredits Int      @default(0) @map("green_credits")
+  greenTier    String   @default("SEEDLING") @map("green_tier")
+  nearestDcId  String?  @map("nearest_dc_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  nearestDc         DeliveryCenter?     @relation(fields: [nearestDcId], references: [id])
+  orders            Order[]
+  returns           Return[]
+  marketplaceOrders MarketplaceOrder[]
+  greenCreditLedger GreenCreditLedger[]
+
+  @@map("users")
+}
+
+model DeliveryCenter {
+  id   String @id @map("id")
+  name String
+  city String
+  type String @default("WAREHOUSE")
+
+  users              User[]
+  sourceRoutes       DcRoute[]       @relation("SourceDc")
+  destRoutes         DcRoute[]       @relation("DestDc")
+  returnsAtDc        Return[]
+  inventoryItemsAtDc InventoryItem[]
+
+  @@map("delivery_centers")
+}
+
+model DcRoute {
+  id           String  @id @default(uuid()) @map("id")
+  sourceDcId   String  @map("source_dc_id")
+  destDcId     String  @map("dest_dc_id")
+  distance     Int
+  transferCost Decimal @db.Decimal(10, 2) @map("transfer_cost")
+  estimatedDays Int    @map("estimated_days")
+
+  sourceDc DeliveryCenter @relation("SourceDc", fields: [sourceDcId], references: [id])
+  destDc   DeliveryCenter @relation("DestDc", fields: [destDcId], references: [id])
+
+  @@unique([sourceDcId, destDcId])
+  @@map("dc_routes")
+}
+
+model Order {
+  id        String   @id @map("id")
+  userId    String   @map("user_id")
+  productId String   @map("product_id")
+  status    String   @default("DELIVERED")
+  orderedAt DateTime @default(now()) @map("ordered_at")
+
+  user    User     @relation(fields: [userId], references: [id])
+  product Product  @relation(fields: [productId], references: [id])
+  returns Return[]
+
+  @@index([userId])
+  @@index([productId])
+  @@map("orders")
+}
+
+model Return {
+  id            String   @id @default(uuid()) @map("id")
+  orderId       String   @map("order_id")
+  userId        String   @map("user_id")
+  reason        String
+  status        String   @default("INITIATED")
+  returnMethod  String?  @map("return_method")
+  refundAmount  Decimal? @db.Decimal(10, 2) @map("refund_amount")
+  currentDcId   String?  @map("current_dc_id")
+  routeDecision String?  @map("route_decision")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  order         Order           @relation(fields: [orderId], references: [id])
+  user          User            @relation(fields: [userId], references: [id])
+  currentDc     DeliveryCenter? @relation(fields: [currentDcId], references: [id])
+  images        ReturnImage[]
+  grading       AiGrading?
+  inventoryItem InventoryItem?
+
+  @@index([userId])
+  @@index([orderId])
+  @@index([status])
+  @@map("returns")
+}
+
+model ReturnImage {
+  id        String   @id @default(uuid()) @map("id")
+  returnId  String   @map("return_id")
+  imageUrl  String   @map("image_url")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  return Return @relation(fields: [returnId], references: [id])
+
+  @@map("return_images")
+}
+
+model AiGrading {
+  id                   String   @id @default(uuid()) @map("id")
+  returnId             String   @unique @map("return_id")
+  grade                String
+  score                Int
+  confidence           Decimal  @db.Decimal(5, 2)
+  conditionSummary     String?  @map("condition_summary") @db.Text
+  defectsFound         Json?    @map("defects_found")
+  missingParts         Json?    @map("missing_parts")
+  functionalNotes      String?  @map("functional_notes") @db.Text
+  estimatedResaleValue Decimal? @db.Decimal(10, 2) @map("estimated_resale_value")
+  gradeDiscountPct     Int      @map("grade_discount_pct")
+  routeDecision        String?  @map("route_decision")
+  createdAt            DateTime @default(now()) @map("created_at")
+
+  return Return @relation(fields: [returnId], references: [id])
+
+  @@map("ai_gradings")
+}
+
+model InventoryItem {
+  id           String   @id @default(uuid()) @map("id")
+  returnId     String?  @unique @map("return_id")
+  productId    String   @map("product_id")
+  currentDcId  String   @map("current_dc_id")
+  status       String   @default("AVAILABLE")
+  grade        String
+  basePrice    Decimal  @db.Decimal(10, 2) @map("base_price")
+  sellingPrice Decimal  @db.Decimal(10, 2) @map("selling_price")
+  source       String   @default("RETURN")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  return           Return?           @relation(fields: [returnId], references: [id])
+  product          Product           @relation(fields: [productId], references: [id])
+  currentDc        DeliveryCenter    @relation(fields: [currentDcId], references: [id])
+  marketplaceOrder MarketplaceOrder?
+
+  @@index([status])
+  @@index([currentDcId])
+  @@index([grade])
+  @@map("inventory_items")
+}
+
+model MarketplaceOrder {
+  id              String   @id @default(uuid()) @map("id")
+  inventoryItemId String   @unique @map("inventory_item_id")
+  buyerId         String   @map("buyer_id")
+  sellingPrice    Decimal  @db.Decimal(10, 2) @map("selling_price")
+  shippingCost    Decimal  @db.Decimal(10, 2) @map("shipping_cost")
+  totalPrice      Decimal  @db.Decimal(10, 2) @map("total_price")
+  status          String   @default("CONFIRMED")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  inventoryItem InventoryItem @relation(fields: [inventoryItemId], references: [id])
+  buyer         User          @relation(fields: [buyerId], references: [id])
+
+  @@map("marketplace_orders")
+}
+
+model GradeConfig {
+  id           String   @id @default(uuid()) @map("id")
+  grade        String   @unique
+  label        String
+  discountPct  Int      @map("discount_pct")
+  defaultRoute String   @map("default_route")
+  minMrp       Decimal? @db.Decimal(10, 2) @map("min_mrp")
+
+  @@map("grade_configs")
+}
+
+model GreenCreditLedger {
+  id          String   @id @default(uuid()) @map("id")
+  userId      String   @map("user_id")
+  amount      Int
+  action      String
+  referenceId String?  @map("reference_id")
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("green_credit_ledger")
+}
