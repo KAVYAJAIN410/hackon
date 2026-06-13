@@ -612,5 +612,5 @@ NICE TO HAVE (if time permits):
 > 5. Added **Smart Donate** logic for sub-₹150 items
 > 6. Added Jaipur DC + local buyers for Priya's "nearby matching"
 > 7. Demo script now leads with the HARD problems, not the easy ones
->
 > **Do you want me to proceed with the implementation plan and start building?**
+
