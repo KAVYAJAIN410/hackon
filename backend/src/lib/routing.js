@@ -1,134 +1,151 @@
-const { GRADE_CONFIG, COSTS } = require('./constants');
-const { calculateDeliveryCost, calculateViability } = require('./costing');
+const { COSTS, GRADE_CONFIG } = require('./constants');
 
 /**
- * Decide the route for a returned product based on AI grade and viability
- * This is the SOLE decision-maker — the user does NOT choose.
- * 
- * @param {string} grade - AI-assigned grade (A+, A, B, C, D, F)
- * @param {number} mrp - Original MRP of product
- * @param {number} shippingCost - Estimated total shipping cost
- * @param {boolean} hasLocalBuyers - Whether there are buyers near the DC
+ * Decide the optimal route for a returned product.
+ *
+ * @param {string}  grade          - AI-assigned grade (A+, A, B, C, D, F)
+ * @param {number}  mrp            - Original MRP of the product
+ * @param {number}  sellingPrice   - Calculated selling price after grade discount
+ * @param {number}  totalCost      - Total logistics cost (handling + transfer + last mile)
+ * @param {boolean} hasLocalBuyers - Whether buyers exist near the current DC
  * @returns {{ chosenRoute: string, reason: string, alternatives: Array }}
  */
-function decideRoute(grade, mrp, shippingCost, hasLocalBuyers = false) {
-  const gradeConfig = GRADE_CONFIG[grade] || GRADE_CONFIG['D'];
+function decideRoute(grade, mrp, sellingPrice, totalCost, hasLocalBuyers) {
+  const config = GRADE_CONFIG[grade];
+  if (!config) {
+    return {
+      chosenRoute: 'RECYCLE',
+      reason: `Unknown grade "${grade}" — routing to recycle for safety.`,
+      alternatives: [],
+    };
+  }
+
+  const minMrp = config.minMrp;
+  const profit = sellingPrice - totalCost - COSTS.MIN_MARGIN;
+
+  // ─── Evaluate all 4 route alternatives ───
   const alternatives = [];
 
-  // Evaluate RESELL viability
-  const resellViability = calculateViability(mrp, gradeConfig.discountPct, shippingCost);
-  const resellViable = resellViability.viable
-    && ['A+', 'A', 'B'].includes(grade)
-    && (gradeConfig.minMrp === null || mrp >= gradeConfig.minMrp);
+  // 1. RESELL evaluation
+  const resellViable =
+    ['A+', 'A', 'B'].includes(grade) &&
+    sellingPrice > totalCost + COSTS.MIN_MARGIN &&
+    (minMrp === null || mrp >= minMrp);
 
   alternatives.push({
     route: 'RESELL',
     viable: resellViable,
-    reason: resellViable
-      ? `Selling price ₹${resellViability.sellingPrice} covers costs ₹${resellViability.totalCost} with ₹${resellViability.profit} margin`
-      : resellViability.profit <= 0
-        ? `Selling price ₹${resellViability.sellingPrice} < minimum cost ₹${resellViability.totalCost}`
-        : `Grade ${grade} not eligible for direct resale`,
-    sellingPrice: resellViability.sellingPrice,
-    totalCost: resellViability.totalCost,
-    profit: resellViability.profit,
+    reason: !['A+', 'A', 'B'].includes(grade)
+      ? `Grade ${grade} not eligible for resale`
+      : minMrp !== null && mrp < minMrp
+        ? `MRP ₹${mrp} below minimum ₹${minMrp} for grade ${grade}`
+        : sellingPrice <= totalCost + COSTS.MIN_MARGIN
+          ? `Selling price ₹${sellingPrice} doesn't cover cost ₹${totalCost} + margin ₹${COSTS.MIN_MARGIN}`
+          : hasLocalBuyers
+            ? `Profitable locally: ₹${sellingPrice} - ₹${totalCost} = ₹${profit} margin`
+            : `Profitable: ₹${sellingPrice} - ₹${totalCost} = ₹${profit} margin`,
+    sellingPrice,
+    totalCost,
+    profit: resellViable ? profit : sellingPrice - totalCost - COSTS.MIN_MARGIN,
   });
 
-  // Evaluate REFURBISH viability
+  // 2. REFURBISH evaluation
   const refurbishViable = ['B', 'C'].includes(grade) && mrp >= 500;
+
   alternatives.push({
     route: 'REFURBISH',
     viable: refurbishViable,
-    reason: refurbishViable
-      ? `Grade ${grade} product worth ₹${mrp} can be refurbished for resale`
-      : grade === 'F'
-        ? 'Product is unsalvageable — cannot be refurbished'
-        : `Grade ${grade} does not need refurbishment or MRP too low`,
+    reason: !['B', 'C'].includes(grade)
+      ? `Grade ${grade} not suitable for refurbishment`
+      : mrp < 500
+        ? `MRP ₹${mrp} too low to justify refurbishment cost`
+        : `Grade ${grade} item can be restored and resold after refurbishment`,
     sellingPrice: refurbishViable ? Math.round(mrp * 0.5) : 0,
-    totalCost: refurbishViable ? COSTS.HANDLING_TOTAL + 100 : 0, // +100 refurb cost estimate
-    profit: refurbishViable ? Math.round(mrp * 0.5) - (COSTS.HANDLING_TOTAL + 100) : 0,
+    totalCost: refurbishViable ? totalCost + 150 : 0, // refurbishment adds ~₹150
+    profit: refurbishViable ? Math.round(mrp * 0.5) - totalCost - 150 : 0,
   });
 
-  // Evaluate DONATE viability
-  const donateViable = grade !== 'F';
+  // 3. DONATE evaluation
+  const donateViable = grade !== 'F'; // Can't donate broken/hazardous items
+
   alternatives.push({
     route: 'DONATE',
     viable: donateViable,
-    reason: donateViable
-      ? 'Product is in usable condition and can be donated'
-      : 'Product is unsafe or unsalvageable — cannot be donated',
+    reason: grade === 'F'
+      ? 'Grade F items may be hazardous — cannot donate'
+      : !resellViable
+        ? `Not viable for resale — donate locally for ₹17 instead of ₹${COSTS.OLD_SYSTEM_COST_PER_ITEM} old system cost`
+        : `Could donate, but resale is more valuable`,
     sellingPrice: 0,
-    totalCost: COSTS.HANDLING_TOTAL,
+    totalCost: 17, // Donation cost: ₹2 AI grading + ₹15 NGO pickup
     profit: 0,
   });
 
-  // Evaluate RECYCLE viability
+  // 4. RECYCLE evaluation
+  const recycleViable = true; // Always possible as last resort
+
   alternatives.push({
     route: 'RECYCLE',
-    viable: true,
+    viable: recycleViable,
     reason: grade === 'F'
-      ? 'Product is unsalvageable — must be recycled/scrapped'
-      : 'Any product can be recycled as a last resort',
+      ? 'Safety hazard — must be sent to certified e-waste recycler'
+      : 'Last resort — item sent to recycling facility',
     sellingPrice: 0,
-    totalCost: COSTS.HANDLING_TOTAL,
+    totalCost: 25, // Recycling pickup cost
     profit: 0,
   });
 
-  // Decision logic: Amazon decides based on grade and viability
+  // ─── Choose the best route ───
   let chosenRoute;
   let reason;
 
-  if (resellViable) {
+  if (grade === 'F') {
+    chosenRoute = 'RECYCLE';
+    reason = 'Grade F — safety hazard, must recycle via certified e-waste facility.';
+  } else if (resellViable) {
     chosenRoute = 'RESELL';
-    reason = `Grade ${grade} product is viable for resale at ₹${resellViability.sellingPrice} (${gradeConfig.discountPct}% off MRP). ${hasLocalBuyers ? 'Local buyers available.' : ''}`;
+    reason = hasLocalBuyers
+      ? `Grade ${grade}, profitable (₹${profit} margin), local buyers available — list on marketplace.`
+      : `Grade ${grade}, profitable (₹${profit} margin) — list on marketplace.`;
   } else if (refurbishViable) {
     chosenRoute = 'REFURBISH';
-    reason = `Grade ${grade} product needs refurbishment before resale. Estimated post-refurb value: ₹${Math.round(mrp * 0.5)}.`;
+    reason = `Grade ${grade}, not directly resellable but can be refurbished (MRP ₹${mrp}).`;
   } else if (donateViable) {
     chosenRoute = 'DONATE';
-    reason = `Product is not viable for resale (cost ₹${resellViability.totalCost} > selling price ₹${resellViability.sellingPrice}) but is in usable condition. Routed to donation.`;
+    reason = `Not viable for resale (cost ₹${totalCost} > selling price ₹${sellingPrice}). Smart donate for ₹17 vs old system ₹${COSTS.OLD_SYSTEM_COST_PER_ITEM}.`;
   } else {
     chosenRoute = 'RECYCLE';
-    reason = `Product graded ${grade} — unsalvageable. Routed to responsible recycling/scrapping.`;
+    reason = 'No viable route — sending to recycling.';
   }
 
-  return {
-    chosenRoute,
-    reason,
-    alternatives,
-  };
+  return { chosenRoute, reason, alternatives };
 }
 
 /**
- * Get demand signal: count of users near a DC interested in a product category
+ * Get demand signal — count of users near a DC who have bought in the same category.
+ * Powers the "X buyers near you want this" display.
+ *
+ * @param {string} productId - The product to check demand for
+ * @param {string} dcId      - The delivery center to check local demand around
+ * @param {object} prisma    - PrismaClient instance
+ * @returns {Promise<number>} Count of interested local buyers
  */
 async function getDemandSignal(productId, dcId, prisma) {
-  try {
-    const product = await prisma.product.findUnique({
-      where: { id: productId },
-      select: { category: true },
-    });
+  const product = await prisma.product.findUnique({ where: { id: productId } });
+  if (!product) return 0;
 
-    if (!product) return 0;
-
-    const count = await prisma.user.count({
-      where: {
-        nearestDcId: dcId,
-        orders: {
-          some: {
-            product: { category: product.category },
-          },
+  const count = await prisma.user.count({
+    where: {
+      nearestDcId: dcId,
+      orders: {
+        some: {
+          product: { category: product.category },
         },
       },
-    });
+    },
+  });
 
-    return count;
-  } catch {
-    return 0;
-  }
+  return count;
 }
 
-module.exports = {
-  decideRoute,
-  getDemandSignal,
-};
+module.exports = { decideRoute, getDemandSignal };
