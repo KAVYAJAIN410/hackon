@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Amazon.in | Return Flow</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#6abdd3",
+                        "inverse-on-surface": "#f0f1f2",
+                        "on-secondary": "#ffffff",
+                        "border-subtle": "#E5E7EB",
+                        "error": "#ba1a1a",
+                        "primary-container": "#ff9900",
+                        "on-secondary-fixed-variant": "#3c4858",
+                        "tertiary-fixed": "#adecff",
+                        "surface-variant": "#e1e3e4",
+                        "on-tertiary-container": "#004b59",
+                        "white": "#FFFFFF",
+                        "on-tertiary-fixed-variant": "#004e5d",
+                        "on-secondary-container": "#576474",
+                        "inverse-primary": "#ffb86f",
+                        "secondary-container": "#d4e1f5",
+                        "reloop-green": "#16A34A",
+                        "primary": "#8a5100",
+                        "secondary-fixed": "#d7e3f7",
+                        "primary-fixed-dim": "#ffb86f",
+                        "on-surface-variant": "#554434",
+                        "on-primary-container": "#653a00",
+                        "secondary-fixed-dim": "#bbc7db",
+                        "surface-tint": "#8a5100",
+                        "on-primary-fixed-variant": "#693c00",
+                        "on-tertiary-fixed": "#001f26",
+                        "amazon-dark": "#131A22",
+                        "primary-fixed": "#ffdcbd",
+                        "surface-container-low": "#f3f4f5",
+                        "inverse-surface": "#2e3132",
+                        "on-tertiary": "#ffffff",
+                        "outline-variant": "#dbc2ad",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "outline": "#887361",
+                        "on-error": "#ffffff",
+                        "surface-container-highest": "#e1e3e4",
+                        "surface-container-high": "#e7e8e9",
+                        "tertiary-fixed-dim": "#80d2e9",
+                        "on-background": "#191c1d",
+                        "surface-container": "#edeeef",
+                        "on-primary": "#ffffff",
+                        "surface-dim": "#d9dadb",
+                        "surface-bright": "#f8f9fa",
+                        "tertiary": "#00687a",
+                        "on-surface": "#191c1d",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed": "#101c2b",
+                        "background": "#f8f9fa",
+                        "on-primary-fixed": "#2c1600",
+                        "surface": "#f8f9fa",
+                        "secondary": "#535f70"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "1rem",
+                        "margin-mobile": "1rem",
+                        "stack-md": "1rem",
+                        "margin-desktop": "1.5rem",
+                        "stack-sm": "0.5rem",
+                        "container-max": "1280px",
+                        "stack-xs": "0.25rem"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "label-bold": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "price-lg": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["11px", {"lineHeight": "14px", "fontWeight": "600"}],
+                        "body-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                        "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "title-lg": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "label-bold": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "700"}],
+                        "display-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "price-lg": ["24px", {"lineHeight": "24px", "fontWeight": "500"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .ai-pulse {
+            animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse-ring {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: .5; transform: scale(1.05); }
+        }
+        .step-transition {
+            transition: transform 0.4s ease-in-out, opacity 0.3s ease-in-out;
+        }
+        .hide-step {
+            display: none;
+            opacity: 0;
+            transform: translateX(20px);
+        }
+        .active-step {
+            display: block;
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .progress-line {
+            transition: width 0.4s ease;
+        }
+    </style>
+</head>
+<body class="bg-background text-[#0F1111] font-body-md min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="w-full bg-[#131921] text-white z-50 sticky top-0">
+<div class="flex items-center px-4 py-2 gap-4">
+<div class="text-2xl font-bold flex items-center gap-1 tracking-tighter">
+            amazon<span class="text-[#FF9900]">.in</span>
+</div>
+<div class="hidden sm:flex flex-col text-sm leading-tight pt-1 px-2 cursor-pointer">
+<span class="text-[#cccccc] text-xs">Delivering to Jaipur</span>
+<span class="font-bold">Update location</span>
+</div>
+<div class="flex-grow flex h-10 rounded overflow-hidden mx-2 border border-transparent focus-within:border-[#FF9900] focus-within:shadow-[0_0_0_2px_rgba(255,153,0,1)]">
+<select class="bg-[#f3f3f3] text-black px-2 text-sm border-r border-[#cdcdcd] focus:ring-0 border-0 outline-none w-16"><option>All</option></select>
+<input class="flex-grow text-black px-3 focus:outline-none border-0 focus:ring-0" placeholder="Search Amazon.in" type="text"/>
+<button class="bg-[#febd69] hover:bg-[#f3a847] px-4 flex items-center justify-center">
+<span class="material-symbols-outlined text-[#333333]">search</span>
+</button>
+</div>
+<div class="hidden md:flex flex-col text-sm leading-tight cursor-pointer px-2 hover:border-white border border-transparent py-1">
+<span class="text-white font-normal text-xs">Hello, Returns</span>
+<span class="font-bold">&amp; Orders</span>
+</div>
+<div class="flex items-center gap-1 font-bold cursor-pointer hover:border-white border border-transparent px-2 py-1">
+<span class="material-symbols-outlined text-3xl">shopping_cart</span>
+<span>Cart</span>
+</div>
+</div>
+<div class="bg-[#232f3e] px-4 py-1.5 flex items-center gap-4 text-sm">
+<a class="flex items-center gap-1 font-bold hover:border-white border border-transparent px-1" href="#"><span class="material-symbols-outlined text-lg">menu</span> All</a>
+<a class="hover:border-white border border-transparent px-1 hidden md:block" href="#">Fresh</a>
+<a class="hover:border-white border border-transparent px-1" href="#">Amazon miniTV</a>
+<a class="hover:border-white border border-transparent px-1" href="#">Sell</a>
+<a class="hover:border-white border border-transparent px-1" href="#">Best Sellers</a>
+<a class="hover:border-white border border-transparent px-1 hidden sm:block" href="#">Today's Deals</a>
+<a class="hover:border-white border border-transparent px-1 hidden sm:block" href="#">Mobiles</a>
+</div>
+</header>
+<main class="flex-grow flex flex-col items-center py-8 px-margin-mobile md:px-margin-desktop">
+<div class="w-full max-container-max max-w-4xl">
+<!-- Stepped UI Header -->
+<div class="mb-8">
+<div class="flex items-center justify-between relative">
+<!-- Progress Line Background -->
+<div class="absolute top-1/2 left-0 w-full h-0.5 bg-[#D5D9D9] -translate-y-1/2 z-0"></div>
+<!-- Progress Line Active -->
+<div class="absolute top-1/2 left-0 h-0.5 bg-[#E47911] -translate-y-1/2 z-0 progress-line" id="progress-bar" style="width: 0%;"></div>
+<!-- Steps -->
+<div class="flex flex-col items-center z-10 bg-background px-2" data-step="1">
+<div class="w-6 h-6 rounded-full bg-[#E47911] text-white flex items-center justify-center text-xs font-bold mb-1 shadow-[0_0_0_3px_#f8f9fa]">1</div>
+<span class="text-xs font-bold text-[#0F1111]">Item</span>
+</div>
+<div class="flex flex-col items-center z-10 bg-background px-2" data-step="2">
+<div class="w-6 h-6 rounded-full bg-[#EAEDED] border border-[#D5D9D9] text-[#565959] flex items-center justify-center text-xs font-bold mb-1 shadow-[0_0_0_3px_#f8f9fa]" id="step-circle-2">2</div>
+<span class="text-xs font-normal text-[#565959]" id="step-label-2">Reason</span>
+</div>
+<div class="flex flex-col items-center z-10 bg-background px-2" data-step="3">
+<div class="w-6 h-6 rounded-full bg-[#EAEDED] border border-[#D5D9D9] text-[#565959] flex items-center justify-center text-xs font-bold mb-1 shadow-[0_0_0_3px_#f8f9fa]" id="step-circle-3">3</div>
+<span class="text-xs font-normal text-[#565959]" id="step-label-3">Photos</span>
+</div>
+<div class="flex flex-col items-center z-10 bg-background px-2" data-step="4">
+<div class="w-6 h-6 rounded-full bg-[#EAEDED] border border-[#D5D9D9] text-[#565959] flex items-center justify-center text-xs font-bold mb-1 shadow-[0_0_0_3px_#f8f9fa]" id="step-circle-4">4</div>
+<span class="text-xs font-normal text-[#565959]" id="step-label-4">Outcome</span>
+</div>
+</div>
+</div>
+<!-- Flow Content -->
+<div class="bg-white border border-[#D5D9D9] rounded-lg shadow-sm overflow-hidden min-h-[500px] flex flex-col">
+<!-- Step 1: Select Item -->
+<div class="active-step step-transition p-6 md:p-8" id="view-step-1">
+<h2 class="text-2xl font-bold mb-6 text-[#0F1111]">Select item to return</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="border border-[#D5D9D9] p-4 rounded-lg flex gap-4 cursor-pointer hover:bg-[#F7F8F8] transition-colors bg-white shadow-sm ring-1 ring-transparent hover:ring-[#008296]">
+<img alt="Running Shoes" class="w-24 h-24 object-cover rounded bg-white p-1" data-alt="A pair of vibrant red professional running shoes placed on a clean white studio background. The lighting is bright and crisp, highlighting the sleek synthetic texture and ergonomic design. The image captures a high-end commercial aesthetic consistent with modern sports branding." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTMAtADsS05P5grYVjwv6RUm4Zpu3k09aD1iV-DddOwzu_SBtTV-KuK8MXBIWhQRMHE6oeoN7wy_7s7cWIOQg9F5Hm2_TU9vmHBXi6m-HL7qOIIzAYqNkCFcv2kMLf9FTGC0qOv4TqnZ7BEY0FsELVxfBZiOL6DDFouvXFni4CtKdIIRrv3IpLC4KwRpG9CSSgzZKzOhUo2alCqXRZVE46UffbfHK8QeIGbu-QTbPvOHrbU-YmrCIy-jG_hToSgG3Z7vzEye-6dS8"/>
+<div>
+<h3 class="text-sm font-bold text-[#007185] hover:text-[#C45500] hover:underline">Apex Runner Elite</h3>
+<p class="text-xs text-[#565959] mb-2 mt-1">Ordered June 12, 2024</p>
+<span class="px-2 py-1 bg-[#F4F8CB] text-[#0F1111] text-xs font-bold rounded-sm border border-[#D5D9D9]">Eligible for Return</span>
+</div>
+</div>
+<div class="border border-[#D5D9D9] p-4 rounded-lg flex gap-4 opacity-60 bg-[#F7F8F8]">
+<img alt="Mechanical Keyboard" class="w-24 h-24 object-cover rounded bg-white p-1" data-alt="A high-performance mechanical gaming keyboard with dark gray keys and subtle RGB backlighting. The setting is a professional workstation with low-key, moody lighting. The perspective is a close-up angled shot showing the tactile texture of the keycaps and the premium metal frame." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgJuujmVnN1hB-sIOG9aZBQ9Fmqx6qGC7WxO6G4bI75q_afxFzb0lu-uAc6pc3Qjb5gGPvcLx-rTpVJuXa3E_aL0PdJiVtxqBpxcdEzD5-oc9XpS3XtrXTPYzMdyjEt6UJrA-uz1IRPCJSuNPbaG8En7LWnbQ0YMduY6mhSC26kL8tpGZA8i_TZKTOIrjXgO3cX8Ihoi3eZvQTyUGWQXhTJa71NkmLE0uuWzwWDmaTmMJuyT-1O-RTqg67uglXuQJPYANj2RkN5to"/>
+<div>
+<h3 class="text-sm font-bold text-[#0F1111]">TypeMaster Pro K2</h3>
+<p class="text-xs text-[#565959] mb-2 mt-1">Ordered May 04, 2024</p>
+<span class="px-2 py-1 bg-[#EAEDED] text-[#565959] text-xs font-medium rounded-sm border border-[#D5D9D9]">Return window closed</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Step 2: Reason -->
+<div class="hide-step step-transition p-6 md:p-8" id="view-step-2">
+<h2 class="text-2xl font-bold mb-2 text-[#0F1111]">Why are you returning this?</h2>
+<p class="text-sm text-[#565959] mb-6">Please choose a reason for return.</p>
+<div class="space-y-0 border border-[#D5D9D9] rounded-lg overflow-hidden">
+<label class="flex items-center p-4 bg-white border-b border-[#D5D9D9] cursor-pointer hover:bg-[#F7F8F8] transition-colors">
+<input class="w-4 h-4 text-[#007185] border-[#888C8C] focus:ring-[#007185]" name="reason" type="radio"/>
+<span class="ml-4 text-sm text-[#0F1111]">Too small / Tight fit</span>
+</label>
+<label class="flex items-center p-4 bg-white border-b border-[#D5D9D9] cursor-pointer hover:bg-[#F7F8F8] transition-colors">
+<input class="w-4 h-4 text-[#007185] border-[#888C8C] focus:ring-[#007185]" name="reason" type="radio"/>
+<span class="ml-4 text-sm text-[#0F1111]">Doesn't match description</span>
+</label>
+<label class="flex items-center p-4 bg-white border-b border-[#D5D9D9] cursor-pointer hover:bg-[#F7F8F8] transition-colors">
+<input class="w-4 h-4 text-[#007185] border-[#888C8C] focus:ring-[#007185]" name="reason" type="radio"/>
+<span class="ml-4 text-sm text-[#0F1111]">Performance not as expected</span>
+</label>
+<label class="flex items-center p-4 bg-white cursor-pointer hover:bg-[#F7F8F8] transition-colors">
+<input class="w-4 h-4 text-[#007185] border-[#888C8C] focus:ring-[#007185]" name="reason" type="radio"/>
+<span class="ml-4 text-sm text-[#0F1111]">Found a better price elsewhere</span>
+</label>
+</div>
+</div>
+<!-- Step 3: Photos (AI Grading) -->
+<div class="hide-step step-transition p-6 md:p-8" id="view-step-3">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h2 class="text-2xl font-bold text-[#0F1111]">Upload item photos</h2>
+<p class="text-sm text-[#565959] mt-1">Help us process your return faster by uploading a few clear photos.</p>
+</div>
+</div>
+<div class="border-2 border-dashed border-[#D5D9D9] bg-[#F7F8F8] rounded-lg p-12 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-white hover:border-[#007185] transition-colors" id="drop-zone">
+<span class="material-symbols-outlined text-4xl text-[#565959] mb-4" data-icon="add_a_photo">add_a_photo</span>
+<p class="text-sm font-bold mb-1 text-[#0F1111]">Drag photos here or click to upload</p>
+<p class="text-xs text-[#565959]">Upload front, sole, and internal tag views.</p>
+</div>
+<div class="grid grid-cols-3 gap-4 mt-8">
+<div class="aspect-square bg-[#EAEDED] rounded-lg relative overflow-hidden flex items-center justify-center border border-[#D5D9D9]">
+<img alt="Upload Preview" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSwIU40wiXPDmvQo-dN5rZY8q65Qbs-TH_6w5Q9mdRCRXfOGsfVm_ZS1MKnooqeZdeNlM4F2PP3UPGdKqE5MoUvtgVvvqvO5E_PEiibvSCPb0KKhIPj40PrtRVWJOKzgcB0hHO7aMJrgHd332ah94VpkIk1FKWnkm-MLmr8caJ8HVUmjItTocsFb1kberc3zlYUe8tnusYDxF-mHrfrcWDYwrxA0MQUpbVat21I6Rs4bS4eEmcsVRSIwszEmONKUsWdb1ndft1_J4"/>
+<div class="absolute bottom-2 right-2 bg-[#067D62] text-white p-1 rounded-full shadow">
+<span class="material-symbols-outlined text-xs" data-icon="check">check</span>
+</div>
+</div>
+<div class="aspect-square bg-[#EAEDED] rounded-lg border border-[#D5D9D9] flex flex-col items-center justify-center relative overflow-hidden" id="grading-placeholder">
+<span class="material-symbols-outlined animate-spin text-[#007185]" data-icon="refresh">refresh</span>
+<span class="text-xs font-bold mt-2 text-[#565959]">Processing...</span>
+</div>
+<div class="aspect-square bg-[#F7F8F8] rounded-lg border border-dashed border-[#D5D9D9] flex items-center justify-center text-[#565959] cursor-pointer hover:bg-white hover:border-[#007185]">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</div>
+</div>
+</div>
+<!-- Step 4: Outcome -->
+<div class="hide-step step-transition p-6 md:p-8" id="view-step-4">
+<div class="mb-8 flex items-center gap-4">
+<div class="inline-flex items-center justify-center w-12 h-12 bg-[#067D62] text-white rounded-full">
+<span class="material-symbols-outlined text-3xl" data-icon="check">check</span>
+</div>
+<div>
+<h2 class="text-2xl font-bold text-[#0F1111]">Return request authorized</h2>
+<p class="text-sm text-[#565959] mt-1">Your item is eligible for return and refund.</p>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Routing Card -->
+<div class="bg-white border border-[#D5D9D9] p-6 rounded-lg">
+<h3 class="text-base font-bold text-[#0F1111] mb-4 border-b border-[#D5D9D9] pb-2">Return Method</h3>
+<div class="flex items-start gap-3 mb-4">
+<input checked="" class="mt-1 text-[#007185] focus:ring-[#007185]" type="radio"/>
+<div>
+<p class="text-sm font-bold text-[#0F1111]">Amazon Hub Locker Drop-off</p>
+<p class="text-sm text-[#007185] hover:underline cursor-pointer mb-1">Find a locker near you</p>
+<p class="text-xs text-[#565959]"><span class="font-bold text-[#067D62]">FREE</span> No box or label needed.</p>
+</div>
+</div>
+</div>
+<!-- Summary Card -->
+<div class="bg-[#F7F8F8] border border-[#D5D9D9] p-6 rounded-lg">
+<h3 class="text-base font-bold text-[#0F1111] mb-4 border-b border-[#D5D9D9] pb-2">Refund Summary</h3>
+<div class="space-y-3">
+<div class="flex justify-between items-center text-sm text-[#0F1111]">
+<span>Refund to Original Payment Method</span>
+<span class="font-bold">₹12,499.00</span>
+</div>
+<div class="flex justify-between items-center text-xs text-[#565959]">
+<span>Estimated processing time</span>
+<span>3-5 business days</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Actions -->
+<div class="mt-auto border-t border-[#D5D9D9] p-4 bg-[#F7F8F8] flex justify-between items-center rounded-b-lg">
+<button class="px-4 py-1.5 bg-white border border-[#D5D9D9] text-[#0F1111] text-sm font-medium rounded-lg shadow-sm hover:bg-[#F7F8F8] transition-all invisible" id="btn-back">Back</button>
+<div class="flex gap-3">
+<button class="px-4 py-1.5 bg-transparent border border-transparent text-[#007185] hover:text-[#C45500] hover:underline text-sm font-medium transition-all" id="btn-cancel">Cancel return</button>
+<button class="px-6 py-1.5 bg-[#FFD814] border border-[#FCD200] text-[#0F1111] text-sm font-medium rounded-lg shadow-sm hover:bg-[#F7CA00] active:scale-95 transition-all" id="btn-next">Continue</button>
+</div>
+</div>
+</div>
+<!-- Impact Summary (Side or Bottom) -->
+<div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="flex items-center gap-4 p-4 border border-[#D5D9D9] rounded-lg bg-[#F7F8F8]">
+<div class="w-10 h-10 bg-white border border-[#D5D9D9] text-[#007185] rounded-full flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined" data-icon="account_balance_wallet">account_balance_wallet</span>
+</div>
+<div>
+<p class="text-xs text-[#565959] uppercase font-bold tracking-wider">Estimated Refund</p>
+<p class="text-lg font-bold text-[#0F1111]">₹12,499.00</p>
+</div>
+</div>
+<div class="flex items-center gap-4 p-4 border border-[#D5D9D9] rounded-lg bg-[#F7F8F8]">
+<div class="w-10 h-10 bg-white border border-[#D5D9D9] text-[#067D62] rounded-full flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined" data-icon="eco">eco</span>
+</div>
+<div>
+<p class="text-xs text-[#565959] uppercase font-bold tracking-wider">Projected Saving</p>
+<p class="text-lg font-bold text-[#0F1111]">4.2kg CO2e</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Component -->
+<footer class="w-full bg-[#232F3E] py-8 flex flex-col items-center gap-4 text-white mt-8">
+<div class="flex flex-wrap justify-center gap-6 mb-2">
+<a class="hover:underline text-sm" href="#">Conditions of Use &amp; Sale</a>
+<a class="hover:underline text-sm" href="#">Privacy Notice</a>
+<a class="hover:underline text-sm" href="#">Interest-Based Ads</a>
+<a class="hover:underline text-sm" href="#">Help</a>
+</div>
+<p class="text-xs text-[#cccccc]">© 1996-2024, Amazon.com, Inc. or its affiliates</p>
+</footer>
+<script>
+        let currentStep = 1;
+        const maxSteps = 4;
+
+        const progressBar = document.getElementById('progress-bar');
+        const btnNext = document.getElementById('btn-next');
+        const btnBack = document.getElementById('btn-back');
+        const btnCancel = document.getElementById('btn-cancel');
+
+        function updateUI() {
+            // Update Visibility
+            for (let i = 1; i <= maxSteps; i++) {
+                const view = document.getElementById(`view-step-${i}`);
+                if (i === currentStep) {
+                    view.classList.remove('hide-step');
+                    view.classList.add('active-step');
+                } else {
+                    view.classList.remove('active-step');
+                    view.classList.add('hide-step');
+                }
+
+                // Update Step Header Icons
+                const circle = document.getElementById(`step-circle-${i}`);
+                const label = document.getElementById(`step-label-${i}`);
+                if (i <= currentStep) {
+                    if (circle) circle.classList.replace('bg-[#EAEDED]', 'bg-[#E47911]');
+                    if (circle) circle.classList.replace('border-[#D5D9D9]', 'border-transparent');
+                    if (circle) circle.classList.replace('text-[#565959]', 'text-white');
+                    if (label) label.classList.replace('text-[#565959]', 'text-[#0F1111]');
+                    if (label) label.classList.replace('font-normal', 'font-bold');
+                } else {
+                    if (circle) circle.classList.replace('bg-[#E47911]', 'bg-[#EAEDED]');
+                    if (circle) circle.classList.replace('border-transparent', 'border-[#D5D9D9]');
+                    if (circle) circle.classList.replace('text-white', 'text-[#565959]');
+                    if (label) label.classList.replace('text-[#0F1111]', 'text-[#565959]');
+                    if (label) label.classList.replace('font-bold', 'font-normal');
+                }
+            }
+
+            // Update Progress Bar Width
+            const progress = ((currentStep - 1) / (maxSteps - 1)) * 100;
+            progressBar.style.width = `${progress}%`;
+
+            // Back button visibility
+            if (currentStep > 1) {
+                btnBack.classList.remove('invisible');
+            } else {
+                btnBack.classList.add('invisible');
+            }
+
+            // Next button text
+            if (currentStep === 3) {
+                btnNext.innerText = 'Upload & Continue';
+            } else if (currentStep === maxSteps) {
+                btnNext.innerText = 'Confirm Return';
+            } else {
+                btnNext.innerText = 'Continue';
+            }
+        }
+
+        btnNext.addEventListener('click', () => {
+            if (currentStep < maxSteps) {
+                if (currentStep === 3) {
+                    // Simulate AI grading pause
+                    btnNext.disabled = true;
+                    btnNext.innerText = "Processing...";
+                    setTimeout(() => {
+                        currentStep++;
+                        updateUI();
+                        btnNext.disabled = false;
+                    }, 1000);
+                } else {
+                    currentStep++;
+                    updateUI();
+                }
+            } else {
+                alert('Return flow submitted successfully!');
+            }
+        });
+
+        btnBack.addEventListener('click', () => {
+            if (currentStep > 1) {
+                currentStep--;
+                updateUI();
+            }
+        });
+
+        // Simple drag & drop visual feedback
+        const dropZone = document.getElementById('drop-zone');
+        if (dropZone) {
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('bg-[#EAF3FE]');
+                dropZone.classList.add('border-[#007185]');
+            });
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('bg-[#EAF3FE]');
+                dropZone.classList.remove('border-[#007185]');
+            });
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('bg-[#EAF3FE]');
+                dropZone.classList.remove('border-[#007185]');
+            });
+        }
+    </script>
+</body></html>

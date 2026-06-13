@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ReLoop Marketplace</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed": "#2c1600",
+                        "surface-container-high": "#e6e9e9",
+                        "surface-container": "#ebeeee",
+                        "on-primary-fixed-variant": "#3c4858",
+                        "primary-fixed": "#d7e3f7",
+                        "on-secondary-fixed-variant": "#693c00",
+                        "tertiary-container": "#00333d",
+                        "surface-container-low": "#f1f4f4",
+                        "surface-bright": "#f7fafa",
+                        "border-standard": "#DDDDDD",
+                        "surface": "#f7fafa",
+                        "surface-dim": "#d7dbdb",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-on-surface": "#eef1f1",
+                        "surface-variant": "#e0e3e3",
+                        "primary": "#0e1a28",
+                        "tertiary-fixed": "#adecff",
+                        "on-primary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "outline": "#75777c",
+                        "tertiary": "#001d23",
+                        "on-secondary-container": "#643900",
+                        "on-primary-fixed": "#101c2b",
+                        "outline-variant": "#c5c6cc",
+                        "on-surface-variant": "#44474c",
+                        "on-primary-container": "#8a97a9",
+                        "on-tertiary-fixed": "#001f26",
+                        "reloop-green": "#16A34A",
+                        "link-blue": "#007185",
+                        "error-container": "#ffdad6",
+                        "inverse-surface": "#2d3131",
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#bbc7db",
+                        "primary-fixed-dim": "#bbc7db",
+                        "on-tertiary-fixed-variant": "#004e5d",
+                        "secondary": "#8a5100",
+                        "secondary-fixed": "#ffdcbd",
+                        "tertiary-fixed-dim": "#80d2e9",
+                        "surface-tint": "#535f70",
+                        "on-surface": "#181c1d",
+                        "on-error": "#ffffff",
+                        "secondary-fixed-dim": "#ffb86f",
+                        "primary-container": "#232f3e",
+                        "on-secondary": "#ffffff",
+                        "amazon-dark": "#131921",
+                        "secondary-container": "#fe9800",
+                        "on-background": "#181c1d",
+                        "on-tertiary-container": "#4ca0b6",
+                        "surface-container-highest": "#e0e3e3",
+                        "background": "#f7fafa"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    spacing: {
+                        "margin-mobile": "12px",
+                        "container-max-width": "1500px",
+                        "margin-desktop": "20px",
+                        "unit": "4px",
+                        "gutter": "12px"
+                    },
+                    fontFamily: {
+                        "body-sm": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-bold": ["Inter"],
+                        "price-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-medium": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    fontSize: {
+                        "body-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+                        "headline-sm": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "label-bold": ["13px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "700" }],
+                        "price-lg": ["28px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+                        "label-medium": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #EAEDED; /* Amazon standard off-white background */
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-surface min-h-screen flex flex-col">
+<!-- Top Navigation Container -->
+<header class="w-full">
+<!-- Main TopAppBar -->
+<nav class="bg-primary-container dark:bg-amazon-dark docked full-width top-0 border-b border-outline-variant flat no shadows cursor-pointer active:scale-95 transition-transform">
+<div class="flex justify-between items-center w-full px-margin-desktop max-w-container-max-width mx-auto h-16">
+<!-- Brand / Logo -->
+<div class="flex items-center gap-4">
+<span class="font-headline-lg text-headline-lg font-bold text-reloop-green">ReLoop x Amazon</span>
+</div>
+<!-- Navigation Links (Desktop) -->
+<div class="hidden md:flex items-center space-x-8">
+<!-- Determining Active State: "Certified Refurbished" is the closest intent to a Marketplace for refurbished/graded goods. -->
+<a class="text-on-primary dark:text-white hover:text-secondary-container hover:opacity-80 transition-opacity duration-200" href="#">
+<span class="font-label-bold text-label-bold">Trade-In</span>
+</a>
+<a class="text-secondary-container font-bold border-b-2 border-secondary-container pb-1 hover:opacity-80 transition-opacity duration-200" href="#">
+<span class="font-label-bold text-label-bold">Certified Refurbished</span>
+</a>
+<a class="text-on-primary dark:text-white hover:text-secondary-container hover:opacity-80 transition-opacity duration-200" href="#">
+<span class="font-label-bold text-label-bold">Impact Hub</span>
+</a>
+<a class="text-on-primary dark:text-white hover:text-secondary-container hover:opacity-80 transition-opacity duration-200" href="#">
+<span class="font-label-bold text-label-bold">Recycle</span>
+</a>
+<a class="text-on-primary dark:text-white hover:text-secondary-container hover:opacity-80 transition-opacity duration-200" href="#">
+<span class="font-label-bold text-label-bold">Returns</span>
+</a>
+</div>
+<!-- Trailing Icons -->
+<div class="flex items-center space-x-4">
+<span class="material-symbols-outlined text-on-primary dark:text-white hover:text-secondary-container hover:opacity-80 transition-opacity duration-200" data-icon="leaf_spark" data-weight="fill">leaf_spark</span>
+<span class="material-symbols-outlined text-on-primary dark:text-white hover:text-secondary-container hover:opacity-80 transition-opacity duration-200" data-icon="shopping_cart" data-weight="fill">shopping_cart</span>
+<span class="material-symbols-outlined text-on-primary dark:text-white hover:text-secondary-container hover:opacity-80 transition-opacity duration-200" data-icon="person" data-weight="fill">person</span>
+</div>
+</div>
+</nav>
+</header>
+<!-- Context Header -->
+<div class="bg-surface-container-lowest border-b border-border-standard w-full">
+<div class="max-w-container-max-width mx-auto px-margin-mobile md:px-margin-desktop py-3 flex items-center justify-between">
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+                Browsing as: <strong>Priya • Jaipur</strong>
+</p>
+<div class="text-link-blue font-body-sm text-body-sm cursor-pointer hover:underline">Change location</div>
+</div>
+</div>
+<!-- Main Content Area -->
+<main class="flex-grow max-w-container-max-width w-full mx-auto px-margin-mobile md:px-margin-desktop py-gutter flex flex-col md:flex-row gap-gutter">
+<!-- Sidebar Filters -->
+<aside class="w-full md:w-64 flex-shrink-0 bg-surface-container-lowest border border-border-standard rounded p-4 self-start">
+<h2 class="font-headline-sm text-headline-sm mb-4">Filters</h2>
+<!-- Category Filter -->
+<div class="mb-6">
+<h3 class="font-label-bold text-label-bold mb-2">Category</h3>
+<ul class="space-y-2 font-body-sm text-body-sm">
+<li><label class="flex items-center gap-2"><input class="rounded border-outline-variant text-link-blue focus:ring-link-blue" type="checkbox"/> Electronics</label></li>
+<li><label class="flex items-center gap-2"><input class="rounded border-outline-variant text-link-blue focus:ring-link-blue" type="checkbox"/> Appliances</label></li>
+<li><label class="flex items-center gap-2"><input class="rounded border-outline-variant text-link-blue focus:ring-link-blue" type="checkbox"/> Furniture</label></li>
+</ul>
+</div>
+<!-- Grade Filter -->
+<div class="mb-6">
+<h3 class="font-label-bold text-label-bold mb-2">Grade</h3>
+<div class="space-y-2 font-body-sm text-body-sm">
+<label class="flex items-center justify-between">
+<span class="flex items-center gap-2"><input checked="" class="rounded border-outline-variant text-link-blue focus:ring-link-blue" type="checkbox"/> Grade A+</span>
+<span class="text-on-surface-variant text-[10px]">Like New</span>
+</label>
+<label class="flex items-center justify-between">
+<span class="flex items-center gap-2"><input class="rounded border-outline-variant text-link-blue focus:ring-link-blue" type="checkbox"/> Grade A</span>
+<span class="text-on-surface-variant text-[10px]">Minor Wear</span>
+</label>
+<label class="flex items-center justify-between">
+<span class="flex items-center gap-2"><input class="rounded border-outline-variant text-link-blue focus:ring-link-blue" type="checkbox"/> Grade B</span>
+<span class="text-on-surface-variant text-[10px]">Visible Scratches</span>
+</label>
+</div>
+</div>
+<!-- Price Filter -->
+<div>
+<h3 class="font-label-bold text-label-bold mb-2">Price</h3>
+<ul class="space-y-2 font-body-sm text-body-sm text-link-blue">
+<li class="cursor-pointer hover:underline">Under ₹1,000</li>
+<li class="cursor-pointer hover:underline">₹1,000 - ₹5,000</li>
+<li class="cursor-pointer hover:underline">₹5,000 - ₹10,000</li>
+<li class="cursor-pointer hover:underline">Over ₹10,000</li>
+</ul>
+</div>
+</aside>
+<!-- Product Grid Canvas -->
+<section class="flex-grow">
+<!-- Grid Container: Tight density, CSS Grid -->
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3">
+<!-- Product Card 1 -->
+<article class="bg-surface-container-lowest border border-border-standard rounded flex flex-col h-full hover:shadow-md transition-shadow duration-200">
+<div class="p-3 flex-grow flex flex-col">
+<div class="relative w-full h-40 mb-3 flex items-center justify-center bg-surface-container-low rounded-sm">
+<img alt="Product 1" class="max-h-full max-w-full object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLumSMkVK2dvC2GyNjcKHHBumMMnDdaiEwVZe_T_q2NeGBAXYsbz4v2PDetRwdO1-3LV6VtITNGD585AQIiVP_wTXW8RL9yHPbxVJUW3sbjW4ArRGDdnpaMTWU1jXyyDMGBZBiq7rfqgSb924A64qnZC0Hb2zFdvVuaX725nuUfJFt3Gr7PVIck2mvjTD1cckhNxtjl7EVx2ZTl9fYWbZp99zwyzJAoD4nr_QHlNuJ-2JC3gHfS99IsbqlQ"/>
+<span class="absolute top-0 right-0 bg-reloop-green text-white font-label-medium text-[10px] px-1 py-0.5 rounded-bl">Grade A+</span>
+</div>
+<h3 class="font-body-md text-body-md text-link-blue hover:underline cursor-pointer line-clamp-2 mb-1">Refurbished Smart LED TV 32-inch</h3>
+<div class="font-price-lg text-price-lg text-on-surface mb-2">₹8,499</div>
+<div class="mt-auto">
+<!-- Logistics breakdown inset -->
+<div class="bg-surface-bright border border-outline-variant border-dashed p-2 rounded-sm mb-3">
+<div class="flex justify-between font-body-sm text-[10px] text-on-surface-variant mb-1">
+<span>Base Value:</span><span>₹8,000</span>
+</div>
+<div class="flex justify-between font-body-sm text-[10px] text-on-surface-variant">
+<span>Logistics &amp; Check:</span><span>+₹499</span>
+</div>
+</div>
+<button class="w-full bg-[#FF9900] bg-gradient-to-b from-[#FFB03B] to-[#FF9900] border border-[#A88734] rounded-[3px] py-1 font-body-md text-body-md text-black hover:bg-opacity-90 transition-opacity flex items-center justify-center gap-1">
+                                Add to Cart
+                            </button>
+</div>
+</div>
+<!-- ReLoop Row (Sustainability Layer) -->
+<div class="bg-[#F0FDF4] border-t border-border-standard p-2 mt-auto">
+<p class="font-body-sm text-[10px] text-reloop-green flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">eco</span>
+                            Saves 15kg CO2e
+                        </p>
+</div>
+</article>
+<!-- Product Card 2 -->
+<article class="bg-surface-container-lowest border border-border-standard rounded flex flex-col h-full hover:shadow-md transition-shadow duration-200">
+<div class="p-3 flex-grow flex flex-col">
+<div class="relative w-full h-40 mb-3 flex items-center justify-center bg-surface-container-low rounded-sm">
+<img alt="Product 2" class="max-h-full max-w-full object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLv8a4N-AkZrmBK-9XAM4dlXlcyNJiDjP5uX_1u6DF4dMrT-oh2RUIVOBeI4ZLWA0EZoikRCedudraJ7sdPBvYfSwxpg9ox88nNW02G51HAdgR9lM6p91Fz4GOD9xoS_li6NeMj4v9Ddmi92oQZAPThK-TuyZIjVwGkB-TbTIY7LFKeSYZEHgEJfCERP8GUO3D93eKaNV0kpZgUBghNMVAid20We_FsaamkmI_BQpYSAL-WSaPvYhYMjjYE"/>
+<span class="absolute top-0 right-0 bg-surface-variant text-on-surface-variant font-label-medium text-[10px] px-1 py-0.5 rounded-bl">Grade B</span>
+</div>
+<h3 class="font-body-md text-body-md text-link-blue hover:underline cursor-pointer line-clamp-2 mb-1">Pre-owned Premium Smartphone 128GB</h3>
+<div class="font-price-lg text-price-lg text-on-surface mb-2">₹12,250</div>
+<div class="mt-auto">
+<!-- Logistics breakdown inset -->
+<div class="bg-surface-bright border border-outline-variant border-dashed p-2 rounded-sm mb-3">
+<div class="flex justify-between font-body-sm text-[10px] text-on-surface-variant mb-1">
+<span>Base Value:</span><span>₹11,900</span>
+</div>
+<div class="flex justify-between font-body-sm text-[10px] text-on-surface-variant">
+<span>Logistics &amp; Check:</span><span>+₹350</span>
+</div>
+</div>
+<button class="w-full bg-[#FF9900] bg-gradient-to-b from-[#FFB03B] to-[#FF9900] border border-[#A88734] rounded-[3px] py-1 font-body-md text-body-md text-black hover:bg-opacity-90 transition-opacity flex items-center justify-center gap-1">
+                                Add to Cart
+                            </button>
+</div>
+</div>
+<!-- ReLoop Row (Sustainability Layer) -->
+<div class="bg-[#F0FDF4] border-t border-border-standard p-2 mt-auto">
+<p class="font-body-sm text-[10px] text-reloop-green flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">eco</span>
+                            Saves 5kg CO2e
+                        </p>
+</div>
+</article>
+<!-- Product Card 3 (Placeholder for density) -->
+<article class="bg-surface-container-lowest border border-border-standard rounded flex flex-col h-full hover:shadow-md transition-shadow duration-200">
+<div class="p-3 flex-grow flex flex-col">
+<div class="relative w-full h-40 mb-3 flex items-center justify-center bg-surface-container-low rounded-sm" data-alt="A modern, high-quality photograph of a certified refurbished wireless noise-canceling headphone resting on a clean, light-mode background. The lighting is bright and evenly distributed, highlighting the sleek curves and unblemished surface of the product. The mood is premium and efficient, perfectly suited for an eco-conscious corporate marketplace listing. Subtle shadows provide depth without visual clutter.">
+</div>
+<h3 class="font-body-md text-body-md text-link-blue hover:underline cursor-pointer line-clamp-2 mb-1">Noise Cancelling Wireless Headphones</h3>
+<div class="font-price-lg text-price-lg text-on-surface mb-2">₹2,999</div>
+<div class="mt-auto">
+<!-- Logistics breakdown inset -->
+<div class="bg-surface-bright border border-outline-variant border-dashed p-2 rounded-sm mb-3">
+<div class="flex justify-between font-body-sm text-[10px] text-on-surface-variant mb-1">
+<span>Base Value:</span><span>₹2,800</span>
+</div>
+<div class="flex justify-between font-body-sm text-[10px] text-on-surface-variant">
+<span>Logistics &amp; Check:</span><span>+₹199</span>
+</div>
+</div>
+<button class="w-full bg-[#FF9900] bg-gradient-to-b from-[#FFB03B] to-[#FF9900] border border-[#A88734] rounded-[3px] py-1 font-body-md text-body-md text-black hover:bg-opacity-90 transition-opacity flex items-center justify-center gap-1">
+                                Add to Cart
+                            </button>
+</div>
+</div>
+<!-- ReLoop Row (Sustainability Layer) -->
+<div class="bg-[#F0FDF4] border-t border-border-standard p-2 mt-auto">
+<p class="font-body-sm text-[10px] text-reloop-green flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">eco</span>
+                            Saves 1.2kg CO2e
+                        </p>
+</div>
+</article>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-amazon-dark dark:bg-amazon-dark full-width border-t border-outline flat no shadows cursor-pointer mt-auto">
+<div class="w-full py-8 px-margin-desktop max-w-container-max-width mx-auto grid grid-cols-2 md:grid-cols-4 gap-gutter">
+<!-- Navigation Links -->
+<div class="col-span-2 md:col-span-3 grid grid-cols-2 md:grid-cols-3 gap-4">
+<a class="text-surface-variant hover:text-white hover:underline" href="#">
+<span class="font-label-bold text-label-bold">Sustainability Standards</span>
+</a>
+<a class="text-surface-variant hover:text-white hover:underline" href="#">
+<span class="font-label-bold text-label-bold">Circular Economy Impact</span>
+</a>
+<a class="text-surface-variant hover:text-white hover:underline" href="#">
+<span class="font-label-bold text-label-bold">Trade-In Terms</span>
+</a>
+<a class="text-surface-variant hover:text-white hover:underline" href="#">
+<span class="font-label-bold text-label-bold">Carbon Footprint Help</span>
+</a>
+<a class="text-surface-variant hover:text-white hover:underline" href="#">
+<span class="font-label-bold text-label-bold">Contact ReLoop</span>
+</a>
+</div>
+<!-- Brand & Copyright -->
+<div class="col-span-2 md:col-span-1 flex flex-col items-end text-right">
+<div class="font-headline-md text-headline-md text-reloop-green mb-2">ReLoop</div>
+<p class="font-body-sm text-body-sm text-on-primary dark:text-on-primary opacity-80">
+                    © 1996-2024, Amazon.com, Inc. or its affiliates. ReLoop Sustainability Partner.
+                </p>
+</div>
+</div>
+</footer>
+</body></html>

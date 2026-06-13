@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ReLoop x Amazon - Sustainable Shopping Ecosystem</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Material Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed": "#2c1600",
+                        "surface-container-high": "#e6e9e9",
+                        "surface-container": "#ebeeee",
+                        "on-primary-fixed-variant": "#3c4858",
+                        "primary-fixed": "#d7e3f7",
+                        "on-secondary-fixed-variant": "#693c00",
+                        "tertiary-container": "#00333d",
+                        "surface-container-low": "#f1f4f4",
+                        "surface-bright": "#f7fafa",
+                        "border-standard": "#DDDDDD",
+                        "surface": "#f7fafa",
+                        "surface-dim": "#d7dbdb",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-on-surface": "#eef1f1",
+                        "surface-variant": "#e0e3e3",
+                        "primary": "#0e1a28",
+                        "tertiary-fixed": "#adecff",
+                        "on-primary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "outline": "#75777c",
+                        "tertiary": "#001d23",
+                        "on-secondary-container": "#643900",
+                        "on-primary-fixed": "#101c2b",
+                        "outline-variant": "#c5c6cc",
+                        "on-surface-variant": "#44474c",
+                        "on-primary-container": "#8a97a9",
+                        "on-tertiary-fixed": "#001f26",
+                        "reloop-green": "#16A34A",
+                        "link-blue": "#007185",
+                        "error-container": "#ffdad6",
+                        "inverse-surface": "#2d3131",
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#bbc7db",
+                        "primary-fixed-dim": "#bbc7db",
+                        "on-tertiary-fixed-variant": "#004e5d",
+                        "secondary": "#8a5100",
+                        "secondary-fixed": "#ffdcbd",
+                        "tertiary-fixed-dim": "#80d2e9",
+                        "surface-tint": "#535f70",
+                        "on-surface": "#181c1d",
+                        "on-error": "#ffffff",
+                        "secondary-fixed-dim": "#ffb86f",
+                        "primary-container": "#232f3e",
+                        "on-secondary": "#ffffff",
+                        "amazon-dark": "#131921",
+                        "secondary-container": "#fe9800",
+                        "on-background": "#181c1d",
+                        "on-tertiary-container": "#4ca0b6",
+                        "surface-container-highest": "#e0e3e3",
+                        "background": "#f7fafa"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin-mobile": "12px",
+                        "container-max-width": "1500px",
+                        "margin-desktop": "20px",
+                        "unit": "4px",
+                        "gutter": "12px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-bold": ["Inter"],
+                        "price-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-medium": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+                        "headline-sm": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "label-bold": ["13px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "700" }],
+                        "price-lg": ["28px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+                        "label-medium": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .fill-icon {
+            font-variation-settings: 'FILL' 1;
+        }
+        .btn-primary {
+            background: linear-gradient(to bottom, #FFB03B, #FF9900);
+            border: 1px solid #A88734;
+            color: #111;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(to bottom, #f7c06c, #f3a847);
+        }
+        .reloop-badge {
+            background-color: #F0FDF4;
+        }
+    </style>
+</head>
+<body class="bg-surface-container-lowest font-body-md text-on-surface">
+<!-- TopNavBar -->
+<header class="bg-primary-container dark:bg-amazon-dark docked full-width top-0 border-b border-outline-variant flat no shadows">
+<div class="flex justify-between items-center w-full px-margin-desktop max-w-container-max-width mx-auto h-16">
+<!-- Brand -->
+<div class="flex items-center space-x-4">
+<span class="font-headline-lg text-headline-lg font-bold text-reloop-green">ReLoop x Amazon</span>
+</div>
+<!-- Navigation Links (Desktop) -->
+<nav class="hidden md:flex space-x-6">
+<!-- Intent: Landing Page. Active state on Impact Hub as it aligns best with the page content -->
+<a class="text-on-primary dark:text-white hover:text-secondary-container font-label-bold text-label-bold cursor-pointer active:scale-95 transition-transform hover:opacity-80 transition-opacity duration-200" href="#">Trade-In</a>
+<a class="text-on-primary dark:text-white hover:text-secondary-container font-label-bold text-label-bold cursor-pointer active:scale-95 transition-transform hover:opacity-80 transition-opacity duration-200" href="#">Certified Refurbished</a>
+<a class="text-secondary-container font-bold border-b-2 border-secondary-container pb-1 font-label-bold text-label-bold cursor-pointer active:scale-95 transition-transform hover:opacity-80 transition-opacity duration-200" href="#">Impact Hub</a>
+<a class="text-on-primary dark:text-white hover:text-secondary-container font-label-bold text-label-bold cursor-pointer active:scale-95 transition-transform hover:opacity-80 transition-opacity duration-200" href="#">Recycle</a>
+<a class="text-on-primary dark:text-white hover:text-secondary-container font-label-bold text-label-bold cursor-pointer active:scale-95 transition-transform hover:opacity-80 transition-opacity duration-200" href="#">Returns</a>
+</nav>
+<!-- Actions -->
+<div class="flex items-center space-x-4 text-on-primary dark:text-white">
+<span class="material-symbols-outlined cursor-pointer hover:opacity-80 transition-opacity duration-200 active:scale-95" data-icon="leaf_spark">leaf_spark</span>
+<span class="material-symbols-outlined cursor-pointer hover:opacity-80 transition-opacity duration-200 active:scale-95" data-icon="shopping_cart">shopping_cart</span>
+<span class="material-symbols-outlined cursor-pointer hover:opacity-80 transition-opacity duration-200 active:scale-95" data-icon="person">person</span>
+</div>
+</div>
+</header>
+<main>
+<!-- Hero Section -->
+<section class="relative w-full h-[500px] flex items-center justify-start bg-amazon-dark overflow-hidden">
+<!-- Background Image -->
+<div class="absolute inset-0 z-0">
+<img alt="A cinematic, high-resolution wide-angle photograph of a pristine, modern sorting facility illuminated by warm, inviting sunlight filtering through large skylights. In the foreground, an assortment of high-quality electronics, carefully packaged items, and raw materials like nuts and grains are arranged aesthetically on a rustic wooden table, subtly conveying a blend of e-commerce scale and natural origins. The background fades into a soft, beautifully blurred bokeh effect showcasing expansive, organized shelving and a sense of efficient, clean logistics. The overall mood is optimistic, premium, and inherently sustainable, heavily utilizing deep amazon dark blues juxtaposed against vibrant reloop greens and rich, natural textures." class="w-full h-full object-cover opacity-70" src="https://lh3.googleusercontent.com/aida/AP1WRLuTsoagyqSYICAVIDH-JtSjSd1JKyOJxGq7StAGlUgN4zGvFKFiqZtU2xjp8wA0M2zxY1ObcCH3rrvoJfmNvNzYjVRS-N8ucwMmPwVMrqt9wIy9PJMeUDWo6UsmU6a6V50z7zx4OtvuKpSncj0J9guM0RnJ9BtAFSFFiR0GybzZVSuGUFrMwQX6mYuUaZznkXSwJMCyxqxDAxrwU-U7EjRAd_3US_PdZLN0D2V8UZYsS11yQGV1Wl-PBHU"/>
+<div class="absolute inset-0 bg-gradient-to-r from-amazon-dark via-amazon-dark/80 to-transparent"></div>
+</div>
+<div class="relative z-10 max-w-container-max-width mx-auto px-margin-desktop w-full text-on-primary">
+<div class="max-w-xl">
+<h1 class="font-headline-lg text-[40px] leading-tight font-bold mb-4">
+                        Extend the Life of Your Products. <br/>
+<span class="text-reloop-green">Maximize Your Value.</span>
+</h1>
+<p class="font-body-lg text-body-lg text-surface-variant mb-6">
+                        Join the circular economy with ReLoop on Amazon. Trade in your used devices, discover certified refurbished electronics, and responsibly recycle—all while earning rewards and reducing your carbon footprint.
+                    </p>
+<div class="flex flex-col sm:flex-row gap-4">
+<button class="btn-primary rounded font-label-bold text-label-bold px-6 py-3 flex items-center justify-center gap-2">
+                            Explore Trade-In Values
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+<button class="bg-surface-container-lowest text-on-surface border border-border-standard hover:bg-surface-variant transition-colors rounded font-label-bold text-label-bold px-6 py-3 flex items-center justify-center gap-2">
+                            Learn About Refurbished
+                        </button>
+</div>
+<!-- Trust Badges -->
+<div class="mt-8 flex items-center gap-4 bg-white/10 backdrop-blur-sm p-3 rounded border border-white/20 w-fit">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary-container">verified</span>
+<span class="font-label-medium text-label-medium">Amazon Certified Quality</span>
+</div>
+<div class="w-px h-4 bg-white/30"></div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-reloop-green">eco</span>
+<span class="font-label-medium text-label-medium">Zero Waste to Landfill Commitment</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Live Impact Stats Banner -->
+<section class="border-y border-border-standard bg-surface-container-low py-6">
+<div class="max-w-container-max-width mx-auto px-margin-desktop">
+<div class="flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-full bg-reloop-green/10 flex items-center justify-center text-reloop-green">
+<span class="material-symbols-outlined text-[28px]">public</span>
+</div>
+<div>
+<p class="font-label-bold text-label-bold text-on-surface">Total CO2e Prevented</p>
+<p class="font-price-lg text-price-lg text-reloop-green font-bold">1,245,600 kg</p>
+</div>
+</div>
+<div class="hidden md:block w-px h-12 bg-border-standard"></div>
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-full bg-primary-fixed/20 flex items-center justify-center text-link-blue">
+<span class="material-symbols-outlined text-[28px]">devices</span>
+</div>
+<div>
+<p class="font-label-bold text-label-bold text-on-surface">Devices Rehomed</p>
+<p class="font-price-lg text-price-lg text-link-blue font-bold">452,890</p>
+</div>
+</div>
+<div class="hidden md:block w-px h-12 bg-border-standard"></div>
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-full bg-secondary-fixed/30 flex items-center justify-center text-secondary-container">
+<span class="material-symbols-outlined text-[28px]">payments</span>
+</div>
+<div>
+<p class="font-label-bold text-label-bold text-on-surface">Customer Cashback Issued</p>
+<p class="font-price-lg text-price-lg text-secondary-container font-bold">₹85.4 Cr</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- How It Works Section -->
+<section class="py-16 bg-surface-container-lowest">
+<div class="max-w-container-max-width mx-auto px-margin-desktop">
+<div class="text-center mb-12">
+<h2 class="font-headline-lg text-headline-lg font-bold text-on-surface mb-2">The ReLoop Lifecycle</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl mx-auto">A seamless, fully integrated process designed to keep valuable materials in circulation while rewarding you for participating.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+<!-- Step 1 -->
+<div class="relative flex flex-col items-center text-center p-6 border border-border-standard rounded hover:shadow-sm transition-shadow bg-surface-bright">
+<div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant mb-4 border border-border-standard">
+<span class="material-symbols-outlined text-[32px]">smartphone</span>
+</div>
+<div class="absolute top-6 left-6 w-8 h-8 rounded bg-amazon-dark text-on-primary font-label-bold flex items-center justify-center shadow">1</div>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface mb-2">Assess Your Device</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Use our instant valuation tool to see what your old phone, laptop, or tablet is worth as Amazon Pay balance.</p>
+</div>
+<!-- Step 2 -->
+<div class="relative flex flex-col items-center text-center p-6 border border-border-standard rounded hover:shadow-sm transition-shadow bg-surface-bright">
+<div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant mb-4 border border-border-standard">
+<span class="material-symbols-outlined text-[32px]">local_shipping</span>
+</div>
+<div class="absolute top-6 left-6 w-8 h-8 rounded bg-amazon-dark text-on-primary font-label-bold flex items-center justify-center shadow">2</div>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface mb-2">Free Doorstep Pickup</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Schedule a convenient pickup time. Our logistics partner will verify the device condition and collect it securely.</p>
+</div>
+<!-- Step 3 -->
+<div class="relative flex flex-col items-center text-center p-6 border border-border-standard rounded hover:shadow-sm transition-shadow bg-surface-bright">
+<div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant mb-4 border border-border-standard">
+<span class="material-symbols-outlined text-[32px]">build</span>
+</div>
+<div class="absolute top-6 left-6 w-8 h-8 rounded bg-amazon-dark text-on-primary font-label-bold flex items-center justify-center shadow">3</div>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface mb-2">Refurbish or Recycle</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Devices are professionally data-wiped and restored to 'Like New' condition, or responsibly broken down for parts.</p>
+</div>
+<!-- Step 4 -->
+<div class="relative flex flex-col items-center text-center p-6 border border-border-standard rounded hover:shadow-sm transition-shadow bg-surface-bright">
+<div class="w-16 h-16 rounded-full bg-reloop-green/20 flex items-center justify-center text-reloop-green mb-4 border border-reloop-green/30">
+<span class="material-symbols-outlined text-[32px]">recycling</span>
+</div>
+<div class="absolute top-6 left-6 w-8 h-8 rounded bg-reloop-green text-white font-label-bold flex items-center justify-center shadow">4</div>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface mb-2">Re-enter the Loop</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Refurbished items are relisted with the ReLoop Certified badge. You spend your rewards on your next purchase.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Persona Section (Bento Grid Style) -->
+<section class="py-16 bg-surface">
+<div class="max-w-container-max-width mx-auto px-margin-desktop">
+<div class="mb-10">
+<h2 class="font-headline-lg text-headline-lg font-bold text-on-surface mb-1">Tailored for Every Participant</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">How ReLoop adds value across the ecosystem.</p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- The Buyer -->
+<div class="bg-surface-container-lowest border border-border-standard rounded flex flex-col h-full hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-shadow">
+<div class="h-48 relative overflow-hidden rounded-t border-b border-border-standard">
+<img alt="A well-lit, modern apartment interior showing a young professional woman happily unboxing a certified refurbished laptop at her clean, minimalist wooden dining table. The scene is brightly illuminated with soft, natural morning light casting gentle shadows. The aesthetic emphasizes a pristine, light-mode feel with white walls and subtle indoor plants, conveying trust, quality, and the satisfaction of receiving a premium eco-friendly product." class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDr4jXNNmZoizeGmj7YQD4GuCrRj3Wh5H2Bwg-Xhd4cYoXYpXL-KZcFlrtAh787er19YXSENqL2S37N95d3F4dgHSPJzzLneozBAXFREaJXTYjac4PBhNZBYwfcXdzdLeOswRHJKBBa3HKfP0736TZQIclSqIbXBzUJKR6uvZzbqAmllm5ElEyKGA_wdKV6V2yca_pzu02Gz15NzwP9jST_HP6gfj6umzexx68UwzdT0RWR-SW4qK4UV_VQ8XMStnK95cNiTm8kbSQ"/>
+</div>
+<div class="p-6 flex-1 flex flex-col">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-link-blue">shopping_bag</span>
+<h3 class="font-headline-md text-headline-md font-bold text-on-surface">The Conscious Buyer</h3>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-6 flex-1">Access premium electronics at a fraction of the cost. Every ReLoop Certified device undergoes a rigorous 100-point inspection and comes with a 1-year Amazon warranty.</p>
+<ul class="space-y-2 mb-6">
+<li class="flex items-start gap-2 text-body-sm font-body-sm text-on-surface">
+<span class="material-symbols-outlined text-reloop-green text-[18px]">check_circle</span>
+                                    Guaranteed Quality Standard
+                                </li>
+<li class="flex items-start gap-2 text-body-sm font-body-sm text-on-surface">
+<span class="material-symbols-outlined text-reloop-green text-[18px]">check_circle</span>
+                                    Lower Carbon Footprint
+                                </li>
+</ul>
+<a class="text-link-blue font-label-bold text-label-bold hover:underline flex items-center gap-1 w-fit" href="#">Shop Certified Refurbished <span class="material-symbols-outlined text-[16px]">chevron_right</span></a>
+</div>
+</div>
+<!-- The Upgrader (Trade-in) -->
+<div class="bg-surface-container-lowest border border-border-standard rounded flex flex-col h-full hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-shadow">
+<div class="h-48 relative overflow-hidden rounded-t border-b border-border-standard bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[80px] text-primary-fixed opacity-50">swap_horiz</span>
+</div>
+<div class="p-6 flex-1 flex flex-col">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-secondary-container">sync_alt</span>
+<h3 class="font-headline-md text-headline-md font-bold text-on-surface">The Smart Upgrader</h3>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-6 flex-1">Turn clutter into currency. Trade in your old smartphones, tablets, and gaming consoles for instant Amazon Pay balance. We handle the pickup and secure data wiping.</p>
+<ul class="space-y-2 mb-6">
+<li class="flex items-start gap-2 text-body-sm font-body-sm text-on-surface">
+<span class="material-symbols-outlined text-reloop-green text-[18px]">check_circle</span>
+                                    Instant Online Valuation
+                                </li>
+<li class="flex items-start gap-2 text-body-sm font-body-sm text-on-surface">
+<span class="material-symbols-outlined text-reloop-green text-[18px]">check_circle</span>
+                                    Military-Grade Data Erasure
+                                </li>
+</ul>
+<a class="text-link-blue font-label-bold text-label-bold hover:underline flex items-center gap-1 w-fit" href="#">Start a Trade-In <span class="material-symbols-outlined text-[16px]">chevron_right</span></a>
+</div>
+</div>
+<!-- The Seller/Partner -->
+<div class="bg-surface-container-lowest border border-border-standard rounded flex flex-col h-full hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-shadow">
+<div class="h-48 relative overflow-hidden rounded-t border-b border-border-standard">
+<img alt="A high-tech, impeccably clean electronics repair and refurbishment workstation. A skilled technician wearing anti-static gear is carefully examining a smartphone under a bright LED magnifying lamp. The environment is highly organized with various small tools, diagnostic equipment, and neatly stacked components. The lighting is bright, cool, and functional, emphasizing precision, technical expertise, and the professional grade standards of the ReLoop certification process." class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3_ATPKdX7pQKBBhEyjRl5vlthJCviYzrE7oXtjK3bmc4aI5VCM1hyDsduHvwXxsHgg1HgTuo3Bx2rjY52V_UoSHzSO-rcPFbldWB2GKHJ42IJCYD8YEiQoZ_MuJRrjpUI1fo9ePM3BkOvUfLPbtr1xnlKNDMvDgHh1IArpPoUL14-ohivo7oYWqRi2J1E56KicoLeLPBjBGM7YXP5bfQveeigoz4YhnDB1rbFZxkLWEJnLx6xv3uCGLRmNNrJBWEk1wKNoYVbQCw"/>
+</div>
+<div class="p-6 flex-1 flex flex-col">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-tertiary-container">handshake</span>
+<h3 class="font-headline-md text-headline-md font-bold text-on-surface">The Certified Partner</h3>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-6 flex-1">Are you a professional refurbisher? Join the ReLoop network to access a massive customer base, standardized grading tools, and reliable inventory supply.</p>
+<ul class="space-y-2 mb-6">
+<li class="flex items-start gap-2 text-body-sm font-body-sm text-on-surface">
+<span class="material-symbols-outlined text-reloop-green text-[18px]">check_circle</span>
+                                    Access Amazon's Customer Base
+                                </li>
+<li class="flex items-start gap-2 text-body-sm font-body-sm text-on-surface">
+<span class="material-symbols-outlined text-reloop-green text-[18px]">check_circle</span>
+                                    Standardized Grading Protocol
+                                </li>
+</ul>
+<a class="text-link-blue font-label-bold text-label-bold hover:underline flex items-center gap-1 w-fit" href="#">Become a Partner <span class="material-symbols-outlined text-[16px]">chevron_right</span></a>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-amazon-dark dark:bg-amazon-dark full-width border-t border-outline flat no shadows">
+<div class="w-full py-8 px-margin-desktop max-w-container-max-width mx-auto grid grid-cols-2 md:grid-cols-4 gap-gutter">
+<div class="flex flex-col gap-4">
+<span class="font-headline-md text-headline-md text-reloop-green font-bold">ReLoop</span>
+<p class="text-on-primary dark:text-on-primary font-body-sm text-body-sm">
+                    © 1996-2024, Amazon.com, Inc. or its affiliates. ReLoop Sustainability Partner.
+                </p>
+</div>
+<div class="flex flex-col gap-2">
+<a class="text-surface-variant hover:text-white font-label-bold text-label-bold cursor-pointer hover:underline" href="#">Sustainability Standards</a>
+<a class="text-surface-variant hover:text-white font-label-bold text-label-bold cursor-pointer hover:underline" href="#">Circular Economy Impact</a>
+</div>
+<div class="flex flex-col gap-2">
+<a class="text-surface-variant hover:text-white font-label-bold text-label-bold cursor-pointer hover:underline" href="#">Trade-In Terms</a>
+<a class="text-surface-variant hover:text-white font-label-bold text-label-bold cursor-pointer hover:underline" href="#">Carbon Footprint Help</a>
+</div>
+<div class="flex flex-col gap-2">
+<a class="text-surface-variant hover:text-white font-label-bold text-label-bold cursor-pointer hover:underline" href="#">Contact ReLoop</a>
+</div>
+</div>
+</footer>
+</body></html>
