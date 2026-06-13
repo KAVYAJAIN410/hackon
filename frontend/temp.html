@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ReLoop Seller Central - Admin Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#6abdd3",
+                        "inverse-on-surface": "#f0f1f2",
+                        "on-secondary": "#ffffff",
+                        "border-subtle": "#E5E7EB",
+                        "error": "#ba1a1a",
+                        "primary-container": "#ff9900",
+                        "on-secondary-fixed-variant": "#3c4858",
+                        "tertiary-fixed": "#adecff",
+                        "surface-variant": "#e1e3e4",
+                        "on-tertiary-container": "#004b59",
+                        "white": "#FFFFFF",
+                        "on-tertiary-fixed-variant": "#004e5d",
+                        "on-secondary-container": "#576474",
+                        "inverse-primary": "#ffb86f",
+                        "secondary-container": "#d4e1f5",
+                        "reloop-green": "#16A34A",
+                        "primary": "#8a5100",
+                        "secondary-fixed": "#d7e3f7",
+                        "primary-fixed-dim": "#ffb86f",
+                        "on-surface-variant": "#554434",
+                        "on-primary-container": "#653a00",
+                        "secondary-fixed-dim": "#bbc7db",
+                        "surface-tint": "#8a5100",
+                        "on-primary-fixed-variant": "#693c00",
+                        "on-tertiary-fixed": "#001f26",
+                        "amazon-dark": "#131A22",
+                        "primary-fixed": "#ffdcbd",
+                        "surface-container-low": "#f3f4f5",
+                        "inverse-surface": "#2e3132",
+                        "on-tertiary": "#ffffff",
+                        "outline-variant": "#dbc2ad",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "outline": "#887361",
+                        "on-error": "#ffffff",
+                        "surface-container-highest": "#e1e3e4",
+                        "surface-container-high": "#e7e8e9",
+                        "tertiary-fixed-dim": "#80d2e9",
+                        "on-background": "#191c1d",
+                        "surface-container": "#edeeef",
+                        "on-primary": "#ffffff",
+                        "surface-dim": "#d9dadb",
+                        "surface-bright": "#f8f9fa",
+                        "tertiary": "#00687a",
+                        "on-surface": "#191c1d",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed": "#101c2b",
+                        "background": "#f8f9fa",
+                        "on-primary-fixed": "#2c1600",
+                        "surface": "#f8f9fa",
+                        "secondary": "#535f70"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "1rem",
+                        "margin-mobile": "1rem",
+                        "stack-md": "1rem",
+                        "margin-desktop": "1.5rem",
+                        "stack-sm": "0.5rem",
+                        "container-max": "1280px",
+                        "stack-xs": "0.25rem"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "label-bold": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "price-lg": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["11px", {"lineHeight": "14px", "fontWeight": "600"}],
+                        "body-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                        "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "title-lg": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "label-bold": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "700"}],
+                        "display-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "price-lg": ["24px", {"lineHeight": "24px", "fontWeight": "500"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 10px; }
+    </style>
+</head>
+<body class="flex min-h-screen text-on-surface">
+<!-- SideNavBar Anchor -->
+<aside class="flex flex-col h-full w-60 fixed left-0 top-0 z-40 bg-white dark:bg-inverse-surface border-r border-border-subtle dark:border-outline">
+<div class="px-6 py-8">
+<div class="text-headline-md font-headline-md text-amazon-dark dark:text-white flex items-center gap-2 mb-8">
+<span class="material-symbols-outlined text-reloop-green" style="font-variation-settings: 'FILL' 1;">recycling</span>
+                ReLoop
+            </div>
+<nav class="space-y-1">
+<!-- Dashboard Active State -->
+<a class="flex items-center gap-3 px-3 py-2 bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary border-r-4 border-primary transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-label-bold font-label-bold">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-secondary dark:text-surface-variant hover:bg-surface-container-low transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="text-label-bold font-label-bold">Inventory</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-secondary dark:text-surface-variant hover:bg-surface-container-low transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="local_shipping">local_shipping</span>
+<span class="text-label-bold font-label-bold">Logistics</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-secondary dark:text-surface-variant hover:bg-surface-container-low transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="recycling">recycling</span>
+<span class="text-label-bold font-label-bold">Sustainability</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-secondary dark:text-surface-variant hover:bg-surface-container-low transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="text-label-bold font-label-bold">Settings</span>
+</a>
+</nav>
+</div>
+<div class="mt-auto px-6 py-6 border-t border-border-subtle">
+<div class="flex items-center gap-3 mb-6">
+<img alt="Seller" class="w-10 h-10 rounded-full object-cover" data-alt="A professional headshot of a middle-aged male business executive in a high-density, modern office environment. He is wearing a crisp white shirt and a navy blazer, projecting authority and operational efficiency. The background is softly blurred with hints of glass partitions and warm ambient office lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCr2O-z8qsJN2NE7FfAJnJLi3o92Hm5EUVoW_bw0N10_VABXJaOV7nFXTySjtfC5EaJhJ5Y2kF4YdmSXWeCRSExcvfsUdLr1yYPcrpqc6nWaM3SgC9PqvTGzU-HTnsJw5PmLzgGADmiNOGLYSywhHE57NMyVHBq9GmkU1IkfZukeDspz2Y0kY5MxyV_OCxDXDck2-0mm8LcxSLvpNnV0JPnY11aZhaIHB3ZZ78O0-5AkF9lOEPpk62rX2JQmmqXAUfVMwuskEb8mfU"/>
+<div>
+<p class="text-label-bold font-label-bold text-on-surface">Seller Central</p>
+<p class="text-body-sm font-body-sm text-secondary">ReLoop Partner</p>
+</div>
+</div>
+<button class="w-full bg-reloop-green text-white py-2 rounded font-label-bold text-label-bold hover:opacity-90 transition-opacity mb-4">
+                View Impact Report
+            </button>
+<div class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-1 text-secondary text-label-bold font-label-bold hover:bg-surface-container-low" href="#">
+<span class="material-symbols-outlined text-[18px]" data-icon="help">help</span> Help
+                </a>
+<a class="flex items-center gap-3 px-3 py-1 text-secondary text-label-bold font-label-bold hover:bg-surface-container-low" href="#">
+<span class="material-symbols-outlined text-[18px]" data-icon="logout">logout</span> Sign Out
+                </a>
+</div>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="flex-1 ml-60 min-h-screen">
+<!-- TopNavBar Anchor -->
+<header class="sticky top-0 z-50 flex justify-between items-center w-full px-margin-desktop py-3 bg-amazon-dark border-b border-on-secondary-fixed-variant shadow-sm">
+<div class="flex items-center gap-6">
+<div class="text-title-lg font-title-lg font-black text-white flex items-center gap-1">
+                    ReLoop <span class="text-primary-container text-body-sm font-bold ml-1">ADMIN</span>
+</div>
+<div class="relative">
+<input class="bg-white border-none rounded text-body-md font-body-md w-96 py-1.5 px-10 focus:ring-2 focus:ring-primary-container" placeholder="Search logistics data..." type="text"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary text-[20px]">search</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-primary-container font-bold border-b-2 border-primary-container pb-1 text-label-bold font-label-bold" href="#">Marketplace</a>
+<a class="text-white font-body-md font-label-bold text-label-bold hover:text-primary-container transition-opacity" href="#">My Orders</a>
+<a class="text-white font-body-md font-label-bold text-label-bold hover:text-primary-container transition-opacity" href="#">My Returns</a>
+</nav>
+<div class="flex items-center gap-4 text-white">
+<div class="flex items-center gap-1 cursor-pointer hover:opacity-90">
+<span class="material-symbols-outlined text-[20px]">location_on</span>
+<span class="text-label-bold font-label-bold">Jaipur</span>
+</div>
+<span class="material-symbols-outlined cursor-pointer hover:text-primary-container" data-icon="eco" style="font-variation-settings: 'FILL' 1;">eco</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-primary-container" data-icon="account_circle">account_circle</span>
+</div>
+</div>
+</header>
+<!-- Dashboard Content -->
+<div class="p-gutter max-w-container-max mx-auto">
+<!-- Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter mb-gutter">
+<!-- Stat Card 1 -->
+<div class="bg-white p-5 border border-border-subtle rounded shadow-sm hover:border-tertiary transition-colors">
+<div class="flex justify-between items-start mb-2">
+<span class="text-label-bold font-label-bold text-secondary uppercase tracking-wider">Total Returns</span>
+<span class="material-symbols-outlined text-primary text-[20px]">assignment_return</span>
+</div>
+<div class="flex items-end gap-2">
+<h2 class="text-display-lg font-display-lg">24,502</h2>
+<span class="text-reloop-green text-label-bold font-label-bold flex items-center mb-1">
+<span class="material-symbols-outlined text-[14px]">arrow_upward</span> 12%
+                        </span>
+</div>
+<p class="text-body-sm font-body-sm text-secondary mt-1">Processed in last 30 days</p>
+</div>
+<!-- Stat Card 2 -->
+<div class="bg-white p-5 border border-border-subtle rounded shadow-sm hover:border-tertiary transition-colors">
+<div class="flex justify-between items-start mb-2">
+<span class="text-label-bold font-label-bold text-secondary uppercase tracking-wider">Route Optimization</span>
+<span class="material-symbols-outlined text-tertiary text-[20px]">route</span>
+</div>
+<div class="flex items-end gap-2">
+<h2 class="text-display-lg font-display-lg">$142k</h2>
+<span class="text-reloop-green text-label-bold font-label-bold flex items-center mb-1">
+<span class="material-symbols-outlined text-[14px]">trending_up</span> 8.4%
+                        </span>
+</div>
+<p class="text-body-sm font-body-sm text-secondary mt-1">Savings from smart routing</p>
+</div>
+<!-- Stat Card 3 -->
+<div class="bg-white p-5 border border-border-subtle rounded shadow-sm hover:border-tertiary transition-colors">
+<div class="flex justify-between items-start mb-2">
+<span class="text-label-bold font-label-bold text-secondary uppercase tracking-wider">Active DCs</span>
+<span class="material-symbols-outlined text-secondary text-[20px]">warehouse</span>
+</div>
+<div class="flex items-end gap-2">
+<h2 class="text-display-lg font-display-lg">18</h2>
+<span class="text-primary-container text-label-bold font-label-bold flex items-center mb-1 ml-2">Operational</span>
+</div>
+<p class="text-body-sm font-body-sm text-secondary mt-1">Delivery Centers monitoring</p>
+</div>
+<!-- Stat Card 4 -->
+<div class="bg-white p-5 border border-border-subtle rounded shadow-sm border-l-4 border-reloop-green">
+<div class="flex justify-between items-start mb-2">
+<span class="text-label-bold font-label-bold text-secondary uppercase tracking-wider">Green Credits</span>
+<span class="material-symbols-outlined text-reloop-green text-[20px]" style="font-variation-settings: 'FILL' 1;">eco</span>
+</div>
+<div class="flex items-end gap-2">
+<h2 class="text-display-lg font-display-lg">892,400</h2>
+<span class="text-reloop-green text-label-bold font-label-bold flex items-center mb-1">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+</span>
+</div>
+<p class="text-body-sm font-body-sm text-secondary mt-1">Total CO2 offset credits</p>
+</div>
+</div>
+<!-- Charts Section -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter mb-gutter">
+<!-- Route Distribution (Pie Chart Mockup) -->
+<div class="bg-white p-6 border border-border-subtle rounded shadow-sm">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-headline-md font-headline-md">Route Distribution</h3>
+<button class="text-secondary hover:text-primary"><span class="material-symbols-outlined">more_horiz</span></button>
+</div>
+<div class="flex items-center justify-between h-64">
+<div class="relative w-48 h-48 flex items-center justify-center">
+<!-- SVG Pie Chart Visualization -->
+<svg class="w-full h-full transform -rotate-90" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="transparent" r="40" stroke="#16A34A" stroke-dasharray="125.6 251.2" stroke-width="20"></circle> <!-- Resell 50% -->
+<circle cx="50" cy="50" fill="transparent" r="40" stroke="#007185" stroke-dasharray="62.8 251.2" stroke-dashoffset="-125.6" stroke-width="20"></circle> <!-- Refurbish 25% -->
+<circle cx="50" cy="50" fill="transparent" r="40" stroke="#ff9900" stroke-dasharray="37.6 251.2" stroke-dashoffset="-188.4" stroke-width="20"></circle> <!-- Donate 15% -->
+<circle cx="50" cy="50" fill="transparent" r="40" stroke="#535f70" stroke-dasharray="25.2 251.2" stroke-dashoffset="-226" stroke-width="20"></circle> <!-- Recycle 10% -->
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+<span class="text-title-lg font-black text-amazon-dark">Rerouted</span>
+<span class="text-body-sm text-secondary">Global</span>
+</div>
+</div>
+<div class="flex flex-col gap-3">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-reloop-green"></div>
+<span class="text-label-bold font-label-bold w-20">Resell</span>
+<span class="text-body-md text-secondary">50%</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-[#007185]"></div>
+<span class="text-label-bold font-label-bold w-20">Refurbish</span>
+<span class="text-body-md text-secondary">25%</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-[#ff9900]"></div>
+<span class="text-label-bold font-label-bold w-20">Donate</span>
+<span class="text-body-md text-secondary">15%</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-secondary"></div>
+<span class="text-label-bold font-label-bold w-20">Recycle</span>
+<span class="text-body-md text-secondary">10%</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Grade Distribution (Bar Chart Mockup) -->
+<div class="bg-white p-6 border border-border-subtle rounded shadow-sm">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-headline-md font-headline-md">Inventory Grade Distribution</h3>
+<div class="flex gap-2">
+<span class="px-2 py-1 bg-surface-container rounded text-label-caps font-label-caps text-secondary">Weekly</span>
+</div>
+</div>
+<div class="flex flex-col h-64 justify-end gap-1 px-4">
+<div class="flex items-end justify-around h-full gap-8">
+<div class="flex flex-col items-center w-full gap-2">
+<div class="bg-reloop-green w-full rounded-t" style="height: 90%;"></div>
+<span class="text-label-bold font-label-bold">A+</span>
+</div>
+<div class="flex flex-col items-center w-full gap-2">
+<div class="bg-tertiary w-full rounded-t" style="height: 75%;"></div>
+<span class="text-label-bold font-label-bold">A</span>
+</div>
+<div class="flex flex-col items-center w-full gap-2">
+<div class="bg-primary-container w-full rounded-t" style="height: 45%;"></div>
+<span class="text-label-bold font-label-bold">B</span>
+</div>
+<div class="flex flex-col items-center w-full gap-2">
+<div class="bg-error w-full rounded-t" style="height: 20%;"></div>
+<span class="text-label-bold font-label-bold">C</span>
+</div>
+</div>
+<div class="w-full h-px bg-border-subtle mt-1"></div>
+</div>
+</div>
+</div>
+<!-- Bottom Table Section -->
+<div class="bg-white border border-border-subtle rounded shadow-sm overflow-hidden">
+<div class="px-6 py-4 border-b border-border-subtle flex justify-between items-center">
+<div>
+<h3 class="text-headline-md font-headline-md">Global Returns &amp; DC Status</h3>
+<p class="text-body-sm font-body-sm text-secondary">Live stream of logistics center performance</p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 border border-border-subtle px-3 py-1.5 rounded text-label-bold font-label-bold hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[18px]">filter_alt</span> Filter
+                        </button>
+<button class="flex items-center gap-2 border border-border-subtle px-3 py-1.5 rounded text-label-bold font-label-bold hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[18px]">download</span> Export CSV
+                        </button>
+</div>
+</div>
+<div class="overflow-x-auto custom-scrollbar">
+<table class="w-full text-left">
+<thead class="bg-surface-container-low text-secondary text-label-caps font-label-caps">
+<tr>
+<th class="px-6 py-3">Location / ID</th>
+<th class="px-6 py-3">Return Volume</th>
+<th class="px-6 py-3">Real-time Load</th>
+<th class="px-6 py-3">Grade Quality</th>
+<th class="px-6 py-3">CO2 Saved</th>
+<th class="px-6 py-3">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-subtle">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-bright transition-colors cursor-pointer">
+<td class="px-6 py-4">
+<div class="font-label-bold">Mumbai DC (IN-MUM-02)</div>
+<div class="text-body-sm text-secondary">Region: Maharashtra</div>
+</td>
+<td class="px-6 py-4 text-body-md font-medium">1,240 units</td>
+<td class="px-6 py-4">
+<div class="w-32 bg-surface-container-highest h-2 rounded-full overflow-hidden">
+<div class="bg-reloop-green h-full" style="width: 82%;"></div>
+</div>
+<span class="text-body-sm text-secondary">82% Capacity</span>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-label-caps font-label-caps">A+ Avg</span>
+</td>
+<td class="px-6 py-4 font-label-bold text-reloop-green">42.8 kg</td>
+<td class="px-6 py-4">
+<span class="flex items-center gap-1.5 text-reloop-green text-label-bold font-label-bold">
+<span class="w-2 h-2 rounded-full bg-reloop-green animate-pulse"></span> Optimal
+                                    </span>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-bright transition-colors cursor-pointer">
+<td class="px-6 py-4">
+<div class="font-label-bold">Bangalore Hub (IN-BLR-01)</div>
+<div class="text-body-sm text-secondary">Region: Karnataka</div>
+</td>
+<td class="px-6 py-4 text-body-md font-medium">984 units</td>
+<td class="px-6 py-4">
+<div class="w-32 bg-surface-container-highest h-2 rounded-full overflow-hidden">
+<div class="bg-primary-container h-full" style="width: 95%;"></div>
+</div>
+<span class="text-body-sm text-secondary">95% Capacity</span>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-label-caps font-label-caps">A Avg</span>
+</td>
+<td class="px-6 py-4 font-label-bold text-reloop-green">31.2 kg</td>
+<td class="px-6 py-4">
+<span class="flex items-center gap-1.5 text-primary-container text-label-bold font-label-bold">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span> High Load
+                                    </span>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-bright transition-colors cursor-pointer">
+<td class="px-6 py-4">
+<div class="font-label-bold">New Delhi Main (IN-DEL-04)</div>
+<div class="text-body-sm text-secondary">Region: NCR</div>
+</td>
+<td class="px-6 py-4 text-body-md font-medium">2,502 units</td>
+<td class="px-6 py-4">
+<div class="w-32 bg-surface-container-highest h-2 rounded-full overflow-hidden">
+<div class="bg-reloop-green h-full" style="width: 45%;"></div>
+</div>
+<span class="text-body-sm text-secondary">45% Capacity</span>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-label-caps font-label-caps">B+ Avg</span>
+</td>
+<td class="px-6 py-4 font-label-bold text-reloop-green">68.5 kg</td>
+<td class="px-6 py-4">
+<span class="flex items-center gap-1.5 text-reloop-green text-label-bold font-label-bold">
+<span class="w-2 h-2 rounded-full bg-reloop-green"></span> Optimal
+                                    </span>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-bright transition-colors cursor-pointer">
+<td class="px-6 py-4">
+<div class="font-label-bold">Chennai Terminal (IN-CHN-02)</div>
+<div class="text-body-sm text-secondary">Region: Tamil Nadu</div>
+</td>
+<td class="px-6 py-4 text-body-md font-medium">412 units</td>
+<td class="px-6 py-4">
+<div class="w-32 bg-surface-container-highest h-2 rounded-full overflow-hidden">
+<div class="bg-error h-full" style="width: 12%;"></div>
+</div>
+<span class="text-body-sm text-secondary">12% Capacity</span>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-label-caps font-label-caps">C Avg</span>
+</td>
+<td class="px-6 py-4 font-label-bold text-reloop-green">14.0 kg</td>
+<td class="px-6 py-4">
+<span class="flex items-center gap-1.5 text-secondary text-label-bold font-label-bold">
+<span class="w-2 h-2 rounded-full bg-secondary"></span> Maintenance
+                                    </span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-6 py-4 bg-surface-container-lowest flex items-center justify-between">
+<span class="text-body-sm text-secondary">Showing 4 of 18 delivery centers</span>
+<div class="flex gap-1">
+<button class="p-2 hover:bg-surface-container rounded text-secondary transition-colors"><span class="material-symbols-outlined">chevron_left</span></button>
+<button class="px-3 py-1 bg-amazon-dark text-white rounded text-label-bold">1</button>
+<button class="px-3 py-1 hover:bg-surface-container rounded text-label-bold">2</button>
+<button class="px-3 py-1 hover:bg-surface-container rounded text-label-bold">3</button>
+<button class="p-2 hover:bg-surface-container rounded text-secondary transition-colors"><span class="material-symbols-outlined">chevron_right</span></button>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Anchor -->
+<footer class="w-full bg-amazon-dark py-8 px-margin-desktop flex flex-col items-center gap-stack-md mt-12 border-t border-on-secondary-fixed-variant">
+<div class="text-title-lg font-title-lg text-white mb-4">ReLoop</div>
+<div class="flex flex-wrap justify-center gap-8 text-surface-variant font-body-sm text-body-sm">
+<a class="hover:text-white transition-colors" href="#">Sustainability Reports</a>
+<a class="hover:text-white transition-colors" href="#">ReLoop Impact</a>
+<a class="hover:text-white transition-colors" href="#">Returns Policy</a>
+<a class="hover:text-white transition-colors" href="#">Help</a>
+</div>
+<div class="mt-4 text-surface-variant text-body-sm opacity-60">
+                © 1996-2024, Amazon.com, Inc. or its affiliates
+            </div>
+</footer>
+</main>
+<!-- Logistics Insights FAB (Contextual) -->
+<button class="fixed bottom-8 right-8 bg-amazon-dark text-white p-4 rounded-full shadow-lg flex items-center gap-2 hover:scale-105 active:scale-95 transition-transform z-50 group">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">insights</span>
+<span class="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs transition-all duration-300 font-label-bold text-label-bold">System Insights</span>
+</button>
+<script>
+        // Micro-interactions for dashboard cards
+        document.querySelectorAll('.stat-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.classList.add('shadow-md');
+            });
+            card.addEventListener('mouseleave', () => {
+                card.classList.remove('shadow-md');
+            });
+        });
+
+        // Simple real-time update simulation
+        setInterval(() => {
+            const loadBars = document.querySelectorAll('.bg-reloop-green.h-full');
+            loadBars.forEach(bar => {
+                const currentWidth = parseInt(bar.style.width);
+                const variation = Math.floor(Math.random() * 5) - 2;
+                const newWidth = Math.min(100, Math.max(10, currentWidth + variation));
+                bar.style.width = newWidth + '%';
+            });
+        }, 5000);
+    </script>
+</body></html>

@@ -1,0 +1,16 @@
+import React from 'react';
+import { MapPin } from 'lucide-react';
+
+export default function MarketplaceHeader() {
+  return (
+    <div className="bg-surface-container-lowest border-b border-border-standard w-full">
+      <div className="max-w-[1500px] mx-auto px-5 py-3 flex items-center justify-between">
+        <p className="font-body-sm text-on-surface-variant flex items-center gap-1">
+          <MapPin className="w-4 h-4" />
+          Browsing as: <strong>Priya • Jaipur</strong>
+        </p>
+        <div className="text-link-blue font-body-sm cursor-pointer hover:underline">Change location</div>
+      </div>
+    </div>
+  );
+}

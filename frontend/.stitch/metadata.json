@@ -1,0 +1,163 @@
+{
+  "name": "projects/9839437392775019931",
+  "projectId": "9839437392775019931",
+  "title": "Amazon HackON",
+  "visibility": "PRIVATE",
+  "createTime": "2026-06-13T12:07:20.752095Z",
+  "updateTime": "2026-06-13T12:46:00.858606Z",
+  "projectType": "TEXT_TO_UI_PRO",
+  "origin": "STITCH",
+  "deviceType": "DESKTOP",
+  "designTheme": {
+    "colorMode": "LIGHT",
+    "font": "INTER",
+    "roundness": "ROUND_FOUR",
+    "customColor": "#ff9900",
+    "headlineFont": "INTER",
+    "bodyFont": "INTER",
+    "labelFont": "INTER",
+    "namedColors": {
+      "amazon-dark": "#131A22",
+      "background": "#f8f9fa",
+      "border-subtle": "#E5E7EB",
+      "error": "#ba1a1a",
+      "error_container": "#ffdad6",
+      "inverse_on_surface": "#f0f1f2",
+      "inverse_primary": "#ffb86f",
+      "inverse_surface": "#2e3132",
+      "on_background": "#191c1d",
+      "on_error": "#ffffff",
+      "on_error_container": "#93000a",
+      "on_primary": "#ffffff",
+      "on_primary_container": "#653a00",
+      "on_primary_fixed": "#2c1600",
+      "on_primary_fixed_variant": "#693c00",
+      "on_secondary": "#ffffff",
+      "on_secondary_container": "#576474",
+      "on_secondary_fixed": "#101c2b",
+      "on_secondary_fixed_variant": "#3c4858",
+      "on_surface": "#191c1d",
+      "on_surface_variant": "#554434",
+      "on_tertiary": "#ffffff",
+      "on_tertiary_container": "#004b59",
+      "on_tertiary_fixed": "#001f26",
+      "on_tertiary_fixed_variant": "#004e5d",
+      "outline": "#887361",
+      "outline_variant": "#dbc2ad",
+      "primary": "#8a5100",
+      "primary_container": "#ff9900",
+      "primary_fixed": "#ffdcbd",
+      "primary_fixed_dim": "#ffb86f",
+      "reloop-green": "#16A34A",
+      "secondary": "#535f70",
+      "secondary_container": "#d4e1f5",
+      "secondary_fixed": "#d7e3f7",
+      "secondary_fixed_dim": "#bbc7db",
+      "surface": "#f8f9fa",
+      "surface_bright": "#f8f9fa",
+      "surface_container": "#edeeef",
+      "surface_container_high": "#e7e8e9",
+      "surface_container_highest": "#e1e3e4",
+      "surface_container_low": "#f3f4f5",
+      "surface_container_lowest": "#ffffff",
+      "surface_dim": "#d9dadb",
+      "surface_tint": "#8a5100",
+      "surface_variant": "#e1e3e4",
+      "tertiary": "#00687a",
+      "tertiary_container": "#6abdd3",
+      "tertiary_fixed": "#adecff",
+      "tertiary_fixed_dim": "#80d2e9",
+      "white": "#FFFFFF"
+    },
+    "designMd": "---\nname: ReLoop Design System\ncolors:\n  surface: '#f8f9fa'\n  surface-dim: '#d9dadb'\n  surface-bright: '#f8f9fa'\n  surface-container-lowest: '#ffffff'\n  surface-container-low: '#f3f4f5'\n  surface-container: '#edeeef'\n  surface-container-high: '#e7e8e9'\n  surface-container-highest: '#e1e3e4'\n  on-surface: '#191c1d'\n  on-surface-variant: '#554434'\n  inverse-surface: '#2e3132'\n  inverse-on-surface: '#f0f1f2'\n  outline: '#887361'\n  outline-variant: '#dbc2ad'\n  surface-tint: '#8a5100'\n  primary: '#8a5100'\n  on-primary: '#ffffff'\n  primary-container: '#ff9900'\n  on-primary-container: '#653a00'\n  inverse-primary: '#ffb86f'\n  secondary: '#535f70'\n  on-secondary: '#ffffff'\n  secondary-container: '#d4e1f5'\n  on-secondary-container: '#576474'\n  tertiary: '#00687a'\n  on-tertiary: '#ffffff'\n  tertiary-container: '#6abdd3'\n  on-tertiary-container: '#004b59'\n  error: '#ba1a1a'\n  on-error: '#ffffff'\n  error-container: '#ffdad6'\n  on-error-container: '#93000a'\n  primary-fixed: '#ffdcbd'\n  primary-fixed-dim: '#ffb86f'\n  on-primary-fixed: '#2c1600'\n  on-primary-fixed-variant: '#693c00'\n  secondary-fixed: '#d7e3f7'\n  secondary-fixed-dim: '#bbc7db'\n  on-secondary-fixed: '#101c2b'\n  on-secondary-fixed-variant: '#3c4858'\n  tertiary-fixed: '#adecff'\n  tertiary-fixed-dim: '#80d2e9'\n  on-tertiary-fixed: '#001f26'\n  on-tertiary-fixed-variant: '#004e5d'\n  background: '#f8f9fa'\n  on-background: '#191c1d'\n  surface-variant: '#e1e3e4'\n  reloop-green: '#16A34A'\n  amazon-dark: '#131A22'\n  border-subtle: '#E5E7EB'\n  white: '#FFFFFF'\ntypography:\n  display-lg:\n    fontFamily: Inter\n    fontSize: 32px\n    fontWeight: '700'\n    lineHeight: 40px\n    letterSpacing: -0.02em\n  display-lg-mobile:\n    fontFamily: Inter\n    fontSize: 24px\n    fontWeight: '700'\n    lineHeight: 32px\n  headline-md:\n    fontFamily: Inter\n    fontSize: 20px\n    fontWeight: '600'\n    lineHeight: 28px\n  title-lg:\n    fontFamily: Inter\n    fontSize: 18px\n    fontWeight: '600'\n    lineHeight: 24px\n  body-md:\n    fontFamily: Inter\n    fontSize: 14px\n    fontWeight: '400'\n    lineHeight: 20px\n  body-sm:\n    fontFamily: Inter\n    fontSize: 12px\n    fontWeight: '400'\n    lineHeight: 16px\n  label-bold:\n    fontFamily: Inter\n    fontSize: 12px\n    fontWeight: '700'\n    lineHeight: 16px\n    letterSpacing: 0.02em\n  label-caps:\n    fontFamily: Inter\n    fontSize: 11px\n    fontWeight: '600'\n    lineHeight: 14px\n  price-lg:\n    fontFamily: Inter\n    fontSize: 24px\n    fontWeight: '500'\n    lineHeight: 24px\nrounded:\n  sm: 0.125rem\n  DEFAULT: 0.25rem\n  md: 0.375rem\n  lg: 0.5rem\n  xl: 0.75rem\n  full: 9999px\nspacing:\n  container-max: 1280px\n  gutter: 1rem\n  margin-mobile: 1rem\n  margin-desktop: 1.5rem\n  stack-xs: 0.25rem\n  stack-sm: 0.5rem\n  stack-md: 1rem\n---\n\n## Brand & Style\n\nThe design system is engineered for **ReLoop**, a high-utility resale and logistics platform operating within the Amazon ecosystem. The brand identity bridges the gap between Amazon’s legendary operational efficiency and a modern, eco-conscious ethos. \n\nThe aesthetic is **Corporate / Modern** with a **High-Density** layout. It prioritizes information architecture and trust over decorative flair. The \"Green\" sustainability layer is integrated through purposeful color accents and gamified \"Green Credit\" modules, ensuring the sustainability mission feels like a functional benefit rather than a marketing afterthought. The UI should evoke a sense of reliability, speed, and environmental responsibility.\n\n## Colors\n\nThe color palette is strictly rooted in the Amazon brand hierarchy to maintain user trust and seamless navigation. \n\n- **Primary CTA:** Amazon Orange (#FF9900) is reserved for the most critical actions, paired with Amazon Dark (#131A22) text for maximum legibility.\n- **Sustainability Layer:** ReLoop Green (#16A34A) is used exclusively for eco-incentives, \"Green Credits,\" carbon savings badges, and successful return status indicators.\n- **Structure:** The background uses a soft off-white (#F9FAFB) to differentiate the page from the white (#FFFFFF) container surfaces, which are defined by subtle gray borders. \n- **Navigation:** The Navbar retains the classic Amazon Dark Blue (#232F3E) to anchor the experience within the marketplace.\n\n## Typography\n\nThis design system uses **Inter** exclusively to ensure a clean, systematic, and highly readable interface across all data-dense views. \n\nThe type hierarchy is optimized for e-commerce utility. Use `title-lg` for product names and `price-lg` for monetary values. `label-caps` and `label-bold` are essential for metadata, logistics tags, and technical specs within the dashboard and product cards. Line heights are kept tight to support the high-density grid requirements of the platform.\n\n## Layout & Spacing\n\nThe system utilizes a **Fluid Grid** model heavily inspired by Amazon's layout, optimized for high information density. \n\n- **Desktop:** A 12-column grid with a max-width of 1280px. Gutters are fixed at 16px to keep content tightly packed but legible.\n- **Dashboards:** Use a sidebar navigation (240px) with a fluid main content area for admin and seller views.\n- **Product Grids:** Maintain a 4 or 5-column structure on desktop, shifting to a 2-column list view on mobile to accommodate logistics details.\n- **Spacing Rhythm:** Use a 4px baseline. Most components should use `stack-sm` (8px) or `stack-xs` (4px) for internal padding to maximize the visible data \"above the fold.\"\n\n## Elevation & Depth\n\nTo maintain the high-density, functional look, this design system avoids heavy shadows or complex gradients. \n\n- **Flat Layering:** Depth is primarily conveyed through color blocking and borders. White (#FFFFFF) cards sit on the Off-White (#F9FAFB) background.\n- **Borders:** Containers and cards use a 1px solid border (#E5E7EB). Active states or featured sections may use a 1px border in Amazon Cyan (#007185).\n- **Subtle Lift:** Only the Primary CTA button and top-level navigation dropdowns utilize a very subtle, tight shadow (0px 2px 4px rgba(0,0,0,0.08)) to indicate interactivity.\n- **Tonal Dividers:** Horizontal rules and vertical dividers use the subtle gray border color to separate logistics data points without breaking the visual flow.\n\n## Shapes\n\nThe shape language is geometric and precise. A **Soft** roundedness (4px - 8px) is applied to maintain a modern feel that isn't overly organic.\n\n- **Standard Elements:** Buttons, input fields, and small cards use a 4px radius (`rounded-sm`).\n- **Feature Cards:** Larger dashboard modules and product containers use an 8px radius (`rounded-md`).\n- **Eco-Badges:** \"Green Credit\" pills and sustainability tags may use a full pill-shape (999px) to distinguish them from standard functional buttons.\n\n## Components\n\n### Buttons\n- **Primary:** Amazon Orange (#FF9900) background, #131A22 text. Rectangular with a 4px radius.\n- **Secondary:** White background with a #E5E7EB border. Used for \"Cancel\" or \"View Details.\"\n- **Eco-Action:** ReLoop Green (#16A34A) used for actions that directly contribute to carbon saving (e.g., \"Opt for Eco-Packaging\").\n\n### Product Cards (Logistics Optimized)\nStandard Amazon-style cards but featuring a \"Logistics Inset\"—a shaded box at the bottom of the card showing `Return Cost Saved` and `CO2 Reduction`.\n\n### Stepped UI\nFor return flows, use a linear progress indicator with sharp connectors. Completed steps are marked in ReLoop Green; current steps in Amazon Cyan.\n\n### Gamified Eco-Modules\nProfile sections display \"Green Credits\" using a progress ring or horizontal bar in ReLoop Green. Use bold, high-contrast labels for the credit count.\n\n### Admin/Seller Dashboards\nUtilize Recharts for data visualization. Use the brand palette for charts: Amazon Cyan for volume, ReLoop Green for sustainability metrics, and Orange for alerts/anomalies. Backgrounds should be strictly White with subtle borders for high-density data tables.\n\n### Input Fields\nStandard 1px border (#E5E7EB) that turns Amazon Cyan on focus. Labels are `label-bold`, placed directly above the field to save horizontal space.",
+    "colorVariant": "FIDELITY",
+    "overridePrimaryColor": "#ff9900",
+    "overrideSecondaryColor": "#232f3e",
+    "overrideTertiaryColor": "#007185",
+    "overrideNeutralColor": "#f9fafb",
+    "spacingScale": 2,
+    "typography": {
+      "body-md": {
+        "fontFamily": "Inter",
+        "fontSize": "14px",
+        "fontWeight": "400",
+        "lineHeight": "20px"
+      },
+      "body-sm": {
+        "fontFamily": "Inter",
+        "fontSize": "12px",
+        "fontWeight": "400",
+        "lineHeight": "16px"
+      },
+      "display-lg": {
+        "fontFamily": "Inter",
+        "fontSize": "32px",
+        "fontWeight": "700",
+        "lineHeight": "40px",
+        "letterSpacing": "-0.02em"
+      },
+      "display-lg-mobile": {
+        "fontFamily": "Inter",
+        "fontSize": "24px",
+        "fontWeight": "700",
+        "lineHeight": "32px"
+      },
+      "headline-md": {
+        "fontFamily": "Inter",
+        "fontSize": "20px",
+        "fontWeight": "600",
+        "lineHeight": "28px"
+      },
+      "label-bold": {
+        "fontFamily": "Inter",
+        "fontSize": "12px",
+        "fontWeight": "700",
+        "lineHeight": "16px",
+        "letterSpacing": "0.02em"
+      },
+      "label-caps": {
+        "fontFamily": "Inter",
+        "fontSize": "11px",
+        "fontWeight": "600",
+        "lineHeight": "14px"
+      },
+      "price-lg": {
+        "fontFamily": "Inter",
+        "fontSize": "24px",
+        "fontWeight": "500",
+        "lineHeight": "24px"
+      },
+      "title-lg": {
+        "fontFamily": "Inter",
+        "fontSize": "18px",
+        "fontWeight": "600",
+        "lineHeight": "24px"
+      }
+    },
+    "spacing": {
+      "container-max": "1280px",
+      "gutter": "1rem",
+      "margin-desktop": "1.5rem",
+      "margin-mobile": "1rem",
+      "stack-md": "1rem",
+      "stack-sm": "0.5rem",
+      "stack-xs": "0.25rem"
+    },
+    "headlineFontFamily": "Inter",
+    "bodyFontFamily": "Inter",
+    "labelFontFamily": "Inter"
+  },
+  "screens": {
+    "index": {
+      "id": "adf479f3824940198eb6a5d738e5635d",
+      "sourceScreen": "projects/9839437392775019931/screens/adf479f3824940198eb6a5d738e5635d",
+      "x": 9968,
+      "y": 3650,
+      "width": 1280,
+      "height": 2050
+    }
+  },
+  "metadata": {
+    "userRole": "OWNER"
+  }
+}
