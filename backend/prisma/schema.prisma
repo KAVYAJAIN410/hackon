@@ -33,7 +33,9 @@ model User {
   greenTier    String   @default("SEEDLING") @map("green_tier")
   nearestDcId  String?  @map("nearest_dc_id")
   createdAt    DateTime @default(now()) @map("created_at")
+  loginId      String?  @unique @map("login_id")
 
+  login             LoginCredentials?   @relation(fields: [loginId], references: [id])
   nearestDc         DeliveryCenter?     @relation(fields: [nearestDcId], references: [id])
   orders            Order[]
   returns           Return[]
@@ -50,21 +52,22 @@ model DeliveryCenter {
   type String @default("WAREHOUSE")
 
   users              User[]
-  sourceRoutes       DcRoute[]       @relation("SourceDc")
-  destRoutes         DcRoute[]       @relation("DestDc")
+  sourceRoutes       DcRoute[]           @relation("SourceDc")
+  destRoutes         DcRoute[]           @relation("DestDc")
   returnsAtDc        Return[]
   inventoryItemsAtDc InventoryItem[]
+  DeliveryAssociate  DeliveryAssociate[]
 
   @@map("delivery_centers")
 }
 
 model DcRoute {
-  id           String  @id @default(uuid()) @map("id")
-  sourceDcId   String  @map("source_dc_id")
-  destDcId     String  @map("dest_dc_id")
-  distance     Int
-  transferCost Decimal @db.Decimal(10, 2) @map("transfer_cost")
-  estimatedDays Int    @map("estimated_days")
+  id            String  @id @default(uuid()) @map("id")
+  sourceDcId    String  @map("source_dc_id")
+  destDcId      String  @map("dest_dc_id")
+  distance      Int
+  transferCost  Decimal @map("transfer_cost") @db.Decimal(10, 2)
+  estimatedDays Int     @map("estimated_days")
 
   sourceDc DeliveryCenter @relation("SourceDc", fields: [sourceDcId], references: [id])
   destDc   DeliveryCenter @relation("DestDc", fields: [destDcId], references: [id])
@@ -79,7 +82,9 @@ model Order {
   productId String   @map("product_id")
   status    String   @default("DELIVERED")
   orderedAt DateTime @default(now()) @map("ordered_at")
+  sellerId  String?  @map("seller_id")
 
+  seller  Seller?  @relation(fields: [sellerId], references: [id])
   user    User     @relation(fields: [userId], references: [id])
   product Product  @relation(fields: [productId], references: [id])
   returns Return[]
@@ -90,24 +95,26 @@ model Order {
 }
 
 model Return {
-  id            String   @id @default(uuid()) @map("id")
-  orderId       String   @map("order_id")
-  userId        String   @map("user_id")
-  reason        String
-  status        String   @default("INITIATED")
-  returnMethod  String?  @map("return_method")
-  refundAmount  Decimal? @db.Decimal(10, 2) @map("refund_amount")
-  currentDcId   String?  @map("current_dc_id")
-  routeDecision String?  @map("route_decision")
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
+  id                String   @id @default(uuid()) @map("id")
+  orderId           String   @map("order_id")
+  userId            String   @map("user_id")
+  reason            String
+  status            String   @default("INITIATED")
+  returnMethod      String?  @map("return_method")
+  refundAmount      Decimal? @map("refund_amount") @db.Decimal(10, 2)
+  currentDcId       String?  @map("current_dc_id")
+  routeDecision     String?  @map("route_decision")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  pickupAssociateId String?  @map("pickup_associate_id")
 
-  order         Order           @relation(fields: [orderId], references: [id])
-  user          User            @relation(fields: [userId], references: [id])
-  currentDc     DeliveryCenter? @relation(fields: [currentDcId], references: [id])
-  images        ReturnImage[]
-  grading       AiGrading?
-  inventoryItem InventoryItem?
+  pickupAssociate DeliveryAssociate? @relation(fields: [pickupAssociateId], references: [id])
+  order           Order              @relation(fields: [orderId], references: [id])
+  user            User               @relation(fields: [userId], references: [id])
+  currentDc       DeliveryCenter?    @relation(fields: [currentDcId], references: [id])
+  images          ReturnImage[]
+  grading         AiGrading?
+  inventoryItem   InventoryItem?
 
   @@index([userId])
   @@index([orderId])
@@ -136,7 +143,7 @@ model AiGrading {
   defectsFound         Json?    @map("defects_found")
   missingParts         Json?    @map("missing_parts")
   functionalNotes      String?  @map("functional_notes") @db.Text
-  estimatedResaleValue Decimal? @db.Decimal(10, 2) @map("estimated_resale_value")
+  estimatedResaleValue Decimal? @map("estimated_resale_value") @db.Decimal(10, 2)
   gradeDiscountPct     Int      @map("grade_discount_pct")
   routeDecision        String?  @map("route_decision")
   createdAt            DateTime @default(now()) @map("created_at")
@@ -153,8 +160,8 @@ model InventoryItem {
   currentDcId  String   @map("current_dc_id")
   status       String   @default("AVAILABLE")
   grade        String
-  basePrice    Decimal  @db.Decimal(10, 2) @map("base_price")
-  sellingPrice Decimal  @db.Decimal(10, 2) @map("selling_price")
+  basePrice    Decimal  @map("base_price") @db.Decimal(10, 2)
+  sellingPrice Decimal  @map("selling_price") @db.Decimal(10, 2)
   source       String   @default("RETURN")
   createdAt    DateTime @default(now()) @map("created_at")
 
@@ -173,9 +180,9 @@ model MarketplaceOrder {
   id              String   @id @default(uuid()) @map("id")
   inventoryItemId String   @unique @map("inventory_item_id")
   buyerId         String   @map("buyer_id")
-  sellingPrice    Decimal  @db.Decimal(10, 2) @map("selling_price")
-  shippingCost    Decimal  @db.Decimal(10, 2) @map("shipping_cost")
-  totalPrice      Decimal  @db.Decimal(10, 2) @map("total_price")
+  sellingPrice    Decimal  @map("selling_price") @db.Decimal(10, 2)
+  shippingCost    Decimal  @map("shipping_cost") @db.Decimal(10, 2)
+  totalPrice      Decimal  @map("total_price") @db.Decimal(10, 2)
   status          String   @default("CONFIRMED")
   createdAt       DateTime @default(now()) @map("created_at")
 
@@ -191,7 +198,7 @@ model GradeConfig {
   label        String
   discountPct  Int      @map("discount_pct")
   defaultRoute String   @map("default_route")
-  minMrp       Decimal? @db.Decimal(10, 2) @map("min_mrp")
+  minMrp       Decimal? @map("min_mrp") @db.Decimal(10, 2)
 
   @@map("grade_configs")
 }
@@ -209,4 +216,67 @@ model GreenCreditLedger {
 
   @@index([userId])
   @@map("green_credit_ledger")
+}
+
+model LoginCredentials {
+  id           String @id @default(uuid()) @map("id")
+  email        String @unique @map("email")
+  passwordHash String @map("password_hash")
+  role         String @default("CUSTOMER") @map("role") // 'ADMIN', 'CUSTOMER', 'DELIVERY_PARTNER', 'SELLER'
+
+  user              User?
+  admin             Admin?
+  deliveryAssociate DeliveryAssociate?
+  seller            Seller?
+
+  @@map("login_credentials")
+}
+
+model Admin {
+  id    String @id @default(uuid()) @map("id")
+  name  String
+  email String @unique
+
+  loginId String?           @unique @map("login_id")
+  login   LoginCredentials? @relation(fields: [loginId], references: [id])
+
+  @@map("admins")
+}
+
+model DeliveryAssociate {
+  id            String  @id @default(uuid()) @map("id")
+  name          String
+  email         String  @unique
+  phone         String?
+  vehicleType   String? @map("vehicle_type")
+  vehicleNumber String? @map("vehicle_number")
+  currentStatus String  @default("OFF_DUTY") // 'OFF_DUTY', 'AVAILABLE', 'ON_DELIVERY'
+  assignedDcId  String? @map("assigned_dc_id")
+
+  assignedDc DeliveryCenter? @relation(fields: [assignedDcId], references: [id])
+
+  loginId String?           @unique @map("login_id")
+  login   LoginCredentials? @relation(fields: [loginId], references: [id])
+  pickups Return[] // Link to assigned returns
+
+  @@map("delivery_associates")
+}
+
+model Seller {
+  id           String  @id @default(uuid()) @map("id")
+  businessName String  @map("business_name")
+  contactName  String  @map("contact_name")
+  email        String  @unique
+  phone        String?
+  taxId        String? @map("tax_id") // e.g., GSTIN
+  address      String?
+  city         String?
+  state        String?
+  status       String  @default("PENDING") // 'PENDING', 'APPROVED', 'SUSPENDED'
+
+  loginId String?           @unique @map("login_id")
+  login   LoginCredentials? @relation(fields: [loginId], references: [id])
+  orders  Order[]
+
+  @@map("sellers")
 }
