@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Leaf, ShoppingCart, User, Menu, X, ChevronDown } from 'lucide-react';
 import { useUser } from '../../context/UserContext';
+import { useCart } from '../../context/CartContext';
 
 const navLinks = [
   { to: '/outgrown-it', label: 'Trade-In' },
@@ -17,6 +18,7 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = React.useState(false);
   const { users, currentUser, setCurrentUser } = useUser();
+  const { totalItems } = useCart();
   const dropdownRef = React.useRef(null);
 
   // Close dropdown on outside click
@@ -106,8 +108,13 @@ export default function Header() {
           <Link to="/green-profile" className="text-[#2DC071] hover:text-[#5be09a] transition-colors" title="Green Profile">
             <Leaf className="w-5 h-5" />
           </Link>
-          <Link to="/marketplace" className="text-[#e0e0e0] hover:text-white transition-colors" title="Cart">
+          <Link to="/cart" className="relative text-[#e0e0e0] hover:text-white transition-colors" title="Cart">
             <ShoppingCart className="w-5 h-5" />
+            {totalItems > 0 && (
+              <span className="absolute -top-2 -right-2 bg-[#FF9900] text-black text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center leading-none">
+                {totalItems > 9 ? '9+' : totalItems}
+              </span>
+            )}
           </Link>
           <Link to="/admin-dashboard" className="text-[#e0e0e0] hover:text-white transition-colors" title="Admin">
             <User className="w-5 h-5" />

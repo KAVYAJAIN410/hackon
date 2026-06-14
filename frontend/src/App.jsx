@@ -1,6 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { UserProvider } from './context/UserContext';
+import { CartProvider } from './context/CartContext';
+import Cart from './pages/Cart';
 import Landing from './pages/Landing';
 import Marketplace from './pages/Marketplace';
 import ProductDetail from './pages/ProductDetail';
@@ -15,6 +17,7 @@ import AdminDashboard from './pages/AdminDashboard';
 function App() {
   return (
     <UserProvider>
+      <CartProvider>
       <Router>
         <Routes>
           <Route path="/" element={<Landing />} />
@@ -27,8 +30,10 @@ function App() {
           <Route path="/my-returns" element={<MyReturns />} />
           <Route path="/green-profile" element={<GreenProfile />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/cart" element={<Cart />} />
         </Routes>
       </Router>
+      </CartProvider>
     </UserProvider>
   );
 }
