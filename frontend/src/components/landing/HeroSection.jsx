@@ -20,13 +20,17 @@ export default function HeroSection() {
             Join the circular economy with ReLoop on Amazon. Trade in your used devices, discover certified refurbished electronics, and responsibly recycle—all while earning rewards and reducing your carbon footprint.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <Button className="bg-gradient-to-b from-[#FFB03B] to-[#FF9900] hover:from-[#f7c06c] hover:to-[#f3a847] text-[#111] border border-[#A88734] font-label-bold px-6 py-6 rounded flex items-center gap-2">
-              Explore Trade-In Values
-              <ArrowRight className="w-4 h-4" />
-            </Button>
-            <Button variant="outline" className="bg-white text-amazon-dark border-border-standard hover:bg-gray-100 hover:text-amazon-dark font-label-bold px-6 py-6 rounded flex items-center gap-2">
-              Learn About Refurbished
-            </Button>
+            <Link to="/outgrown-it">
+              <Button className="bg-gradient-to-b from-[#FFB03B] to-[#FF9900] hover:from-[#f7c06c] hover:to-[#f3a847] text-[#111] border border-[#A88734] font-label-bold px-6 py-6 rounded flex items-center gap-2">
+                Explore Trade-In Values
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </Link>
+            <Link to="/marketplace">
+              <Button variant="outline" className="bg-white text-amazon-dark border-border-standard hover:bg-gray-100 hover:text-amazon-dark font-label-bold px-6 py-6 rounded flex items-center gap-2">
+                Learn About Refurbished
+              </Button>
+            </Link>
           </div>
           
           <div className="mt-8 flex items-center gap-4 bg-white/10 backdrop-blur-sm p-3 rounded border border-white/20 w-fit">

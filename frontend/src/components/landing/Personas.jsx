@@ -31,7 +31,7 @@ export default function Personas() {
                   <CheckCircle className="text-reloop-green w-5 h-5 shrink-0" /> Lower Carbon Footprint
                 </li>
               </ul>
-              <Link to="#" className="text-link-blue font-label-bold hover:underline flex items-center gap-1 w-fit">
+              <Link to="/marketplace" className="text-link-blue font-label-bold hover:underline flex items-center gap-1 w-fit">
                 Shop Certified Refurbished <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
@@ -56,7 +56,7 @@ export default function Personas() {
                   <CheckCircle className="text-reloop-green w-5 h-5 shrink-0" /> Military-Grade Data Erasure
                 </li>
               </ul>
-              <Link to="#" className="text-link-blue font-label-bold hover:underline flex items-center gap-1 w-fit">
+              <Link to="/outgrown-it" className="text-link-blue font-label-bold hover:underline flex items-center gap-1 w-fit">
                 Start a Trade-In <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
@@ -81,7 +81,7 @@ export default function Personas() {
                   <CheckCircle className="text-reloop-green w-5 h-5 shrink-0" /> Standardized Grading Protocol
                 </li>
               </ul>
-              <Link to="#" className="text-link-blue font-label-bold hover:underline flex items-center gap-1 w-fit">
+              <Link to="/seller-dashboard" className="text-link-blue font-label-bold hover:underline flex items-center gap-1 w-fit">
                 Become a Partner <ChevronRight className="w-4 h-4" />
               </Link>
             </div>

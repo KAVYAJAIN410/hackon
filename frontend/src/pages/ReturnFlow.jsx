@@ -30,6 +30,7 @@ export default function ReturnFlow() {
   // Processing state
   const [processing, setProcessing] = useState(false);
   const [gradingResult, setGradingResult] = useState(null);
+  const [gradingFailed, setGradingFailed] = useState(false);
   const [returnData, setReturnData] = useState(null);
 
   // Load orders for step 1
@@ -60,6 +61,7 @@ export default function ReturnFlow() {
     } else if (step === 3) {
       // Step 3 → 4: Submit return + grading
       setProcessing(true);
+      setGradingFailed(false);
       setStep(4);
       try {
         // 1. Create the return
@@ -70,9 +72,14 @@ export default function ReturnFlow() {
         });
         setReturnData(returnResp);
 
+        // Remove returned order from eligible list
+        setOrders(prev => prev.filter(o => o.id !== selectedOrder.id));
+
         // 2. Grade the return with images
         const formData = new FormData();
-        formData.append('returnId', returnResp.returnId);
+        // API expects 'returnId' but response has 'id'
+        const returnId = returnResp.returnId || returnResp.id;
+        formData.append('returnId', returnId);
         if (uploadedFiles.length > 0) {
           uploadedFiles.forEach(file => formData.append('images', file));
         }
@@ -80,20 +87,22 @@ export default function ReturnFlow() {
         setGradingResult(gradeResp);
       } catch (err) {
         console.error('Return/grading failed:', err);
-        alert('Return processing failed: ' + err.message);
-        setStep(3);
+        setGradingFailed(true);
+        // Don't navigate away — show failure in step 4
       } finally {
         setProcessing(false);
       }
     } else if (step === 4) {
-      // Navigate to interception page with grading data
-      navigate('/return-interception', {
-        state: {
-          gradingResult,
-          returnData,
-          order: selectedOrder,
-        }
-      });
+      // Navigate to interception page only if grading succeeded
+      if (gradingResult) {
+        navigate('/return-interception', {
+          state: {
+            gradingResult,
+            returnData,
+            order: selectedOrder,
+          }
+        });
+      }
     }
   };
 
@@ -192,7 +201,7 @@ export default function ReturnFlow() {
                                 </div>
                               )}
                               <div>
-                                <h3 className="text-sm font-bold text-[#007185]">{product.name}</h3>
+                                <h3 className="text-sm font-bold text-[#007185]">{product.name || order.productName || `Order ${order.id}`}</h3>
                                 <p className="text-xs text-[#565959] mb-2 mt-1">
                                   Ordered {new Date(order.orderedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                                 </p>
@@ -279,6 +288,22 @@ export default function ReturnFlow() {
                         <h2 className="text-xl font-bold text-[#0F1111] mb-2">Processing your return...</h2>
                         <p className="text-sm text-[#565959]">Our AI is grading your item. This may take a moment.</p>
                       </div>
+                    ) : gradingFailed ? (
+                      <div className="flex flex-col items-center justify-center py-16 text-center">
+                        <div className="inline-flex items-center justify-center w-12 h-12 bg-red-100 text-red-600 rounded-full mb-4">
+                          <span className="material-symbols-outlined text-3xl">error</span>
+                        </div>
+                        <h2 className="text-2xl font-bold text-[#0F1111] mb-2">Return Flagged</h2>
+                        <p className="text-sm text-[#565959] max-w-sm mb-6">
+                          Grading could not be completed for your item. Your return has been flagged for manual review. Our team will contact you within 24 hours.
+                        </p>
+                        <button
+                          onClick={() => navigate('/my-returns')}
+                          className="px-6 py-2 bg-[#FFD814] border border-[#FCD200] text-[#0F1111] text-sm font-medium rounded-lg hover:bg-[#F7CA00]"
+                        >
+                          View My Returns
+                        </button>
+                      </div>
                     ) : gradingResult ? (
                       <>
                         <div className="mb-8 flex items-center gap-4">
@@ -357,10 +382,10 @@ export default function ReturnFlow() {
                     </button>
                     <button
                       onClick={handleNext}
-                      disabled={processing || (step === 1 && !selectedOrder)}
+                      disabled={processing || (step === 1 && !selectedOrder) || (step === 4 && gradingFailed)}
                       className="px-6 py-1.5 bg-[#FFD814] border border-[#FCD200] text-[#0F1111] text-sm font-medium rounded-lg shadow-sm hover:bg-[#F7CA00] active:scale-95 transition-all disabled:opacity-50"
                     >
-                      {processing ? 'Processing...' : step === 4 ? 'View Options' : step === 3 ? 'Submit & Grade' : 'Next'}
+                      {processing ? 'Processing...' : step === 4 ? (gradingFailed ? 'Flagged' : 'View Options') : step === 3 ? 'Submit & Grade' : 'Next'}
                     </button>
                   </div>
                 </div>

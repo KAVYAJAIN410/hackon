@@ -1,13 +1,69 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import { useCart } from '../context/CartContext';
+import { useUser } from '../context/UserContext';
 import { Leaf, Trash2, Plus, Minus, ShoppingCart } from 'lucide-react';
+import api from '../lib/api';
 
 export default function Cart() {
   const { cartItems, removeFromCart, updateQty, totalItems, totalPrice, clearCart } = useCart();
+  const { currentUser, setShowLoginModal } = useUser();
   const navigate = useNavigate();
+  const [checkingOut, setCheckingOut] = useState(false);
+  const [orderResult, setOrderResult] = useState(null);
+  const [checkoutError, setCheckoutError] = useState(null);
+
+  const handleCheckout = async () => {
+    if (!currentUser) { setShowLoginModal(true); return; }
+    setCheckingOut(true);
+    setCheckoutError(null);
+    try {
+      const results = await Promise.all(
+        cartItems.map(item => api.post(`/marketplace/${item.id}/buy`, { buyerId: currentUser.id }))
+      );
+      const totalCredits = results.reduce((s, r) => s + (r.creditsAwarded || 0), 0);
+      clearCart();
+      setOrderResult({ orders: results.map(r => r.order), totalCredits });
+    } catch (err) {
+      setCheckoutError(err.message || 'Checkout failed. Please try again.');
+    } finally {
+      setCheckingOut(false);
+    }
+  };
+
+  if (orderResult) {
+    return (
+      <div className="min-h-screen bg-[#f8f9fa] flex flex-col">
+        <Header />
+        <main className="flex-grow flex items-center justify-center">
+          <div className="max-w-lg w-full bg-white border border-[#D5D9D9] rounded-lg p-8 shadow-md text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-[#067D62] text-white rounded-full mb-4">
+              <span className="material-symbols-outlined text-4xl">check</span>
+            </div>
+            <h2 className="text-2xl font-bold text-[#0F1111] mb-2">Order Placed!</h2>
+            <p className="text-[#565959] mb-4">{orderResult.orders.length} item{orderResult.orders.length !== 1 ? 's' : ''} purchased successfully.</p>
+            <div className="bg-[#F0FDF4] border border-[#2DC071]/30 rounded-lg p-4 mb-6">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-[#565959]">Green Credits Earned</span>
+                <span className="font-bold text-[#2DC071] text-lg">+{orderResult.totalCredits}</span>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button onClick={() => navigate('/marketplace')} className="flex-1 px-4 py-2 bg-white border border-[#D5D9D9] rounded-lg text-sm font-bold hover:bg-[#F7F8F8]">
+                Continue Shopping
+              </button>
+              <button onClick={() => navigate('/green-profile')} className="flex-1 px-4 py-2 bg-[#FFD814] border border-[#FCD200] rounded-lg text-sm font-bold hover:bg-[#F7CA00]">
+                View Profile
+              </button>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   if (cartItems.length === 0) {
     return (
@@ -170,11 +226,13 @@ export default function Cart() {
                 </div>
 
                 <button
-                  onClick={() => navigate('/marketplace')}
-                  className="w-full bg-[#FFD814] border border-[#FCD200] text-[#0F1111] font-bold py-3 rounded-lg hover:bg-[#F7CA00] active:scale-95 transition-all mb-3"
+                  onClick={handleCheckout}
+                  disabled={checkingOut}
+                  className="w-full bg-[#FFD814] border border-[#FCD200] text-[#0F1111] font-bold py-3 rounded-lg hover:bg-[#F7CA00] active:scale-95 transition-all mb-3 disabled:opacity-60"
                 >
-                  Proceed to Checkout
+                  {checkingOut ? 'Placing Order...' : 'Proceed to Checkout'}
                 </button>
+                {checkoutError && <p className="text-xs text-red-600 mb-2 text-center">{checkoutError}</p>}
                 <button
                   onClick={() => navigate('/marketplace')}
                   className="w-full bg-white border border-[#D5D9D9] text-[#0F1111] font-bold py-3 rounded-lg hover:bg-[#F7F8F8] transition-colors text-sm"
