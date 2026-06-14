@@ -2,7 +2,7 @@ import React from 'react';
 
 const GRADES = ['A+', 'A', 'B'];
 
-export default function FiltersSidebar({ filters, onChange }) {
+export default function FiltersSidebar({ filters, onChange, showMobile }) {
   const toggleGrade = (g) => {
     const next = filters.grades.includes(g)
       ? filters.grades.filter(x => x !== g)
@@ -11,7 +11,7 @@ export default function FiltersSidebar({ filters, onChange }) {
   };
 
   return (
-    <aside className="w-full md:w-64 flex-shrink-0 bg-surface-container-lowest border border-border-standard rounded p-4 self-start">
+    <aside className={`w-full md:w-64 flex-shrink-0 bg-surface-container-lowest border border-border-standard rounded p-4 self-start ${showMobile ? 'block' : 'hidden md:block'}`}>
       <h2 className="font-headline-sm mb-4 font-bold text-lg">Filters</h2>
 
       <div className="mb-6">
