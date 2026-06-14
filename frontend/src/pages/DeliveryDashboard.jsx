@@ -189,19 +189,17 @@ export default function DeliveryDashboard() {
   const [selected, setSelected]   = useState(null);
 
   useEffect(() => {
-    // No dedicated delivery associate endpoint exists yet.
-    // Using admin overview which returns all recent returns, filtered to INITIATED/ROUTED.
-    // TODO: replace with GET /api/returns?associate_id={id} when backend adds it.
-    api.get('/admin/overview')
+    if (!currentUser) return;
+    
+    // Fetch returns dynamically filtered by this associate's ID
+    api.get(`/returns/by-associate?associate_id=${currentUser.id}`)
       .then(data => {
-        const recent = data.recentReturns || [];
-        // Fetch full details for each INITIATED/ROUTED return
-        const pending = recent.filter(r => ['INITIATED', 'ROUTED'].includes(r.status));
+        const pending = Array.isArray(data) ? data : [];
         setOrders(pending);
       })
       .catch(() => setOrders([]))
       .finally(() => setLoading(false));
-  }, []);
+  }, [currentUser]);
 
   // Guard: only delivery partners can access
   if (currentUser && currentUser.role !== 'delivery partner') {
