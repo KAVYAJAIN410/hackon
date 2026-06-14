@@ -72,7 +72,7 @@ export default function ReturnFlow() {
 
         // 2. Grade the return with images
         const formData = new FormData();
-        formData.append('returnId', returnResp.id);
+        formData.append('returnId', returnResp.returnId);
         if (uploadedFiles.length > 0) {
           uploadedFiles.forEach(file => formData.append('images', file));
         }

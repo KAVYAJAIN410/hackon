@@ -4,17 +4,20 @@ import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import { SkeletonBox } from '../components/ui/SkeletonCard';
 import { useUser } from '../context/UserContext';
+import { useCart } from '../context/CartContext';
 import api from '../lib/api';
 
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { currentUser } = useUser();
+  const { addToCart } = useCart();
   const [isLoading, setIsLoading] = useState(true);
   const [item, setItem] = useState(null);
   const [error, setError] = useState(null);
   const [buying, setBuying] = useState(false);
   const [purchaseResult, setPurchaseResult] = useState(null);
+  const [addedToCart, setAddedToCart] = useState(false);
 
   useEffect(() => {
     if (!id || !currentUser) return;
@@ -36,6 +39,21 @@ export default function ProductDetail() {
     } finally {
       setBuying(false);
     }
+  };
+
+  const handleAddToCart = () => {
+    if (!item) return;
+    const product = item.product || {};
+    addToCart({
+      id: item.id,
+      title: product.name || 'Product',
+      price: parseFloat(item.sellingPrice) || 0,
+      grade: `Grade ${item.grade}`,
+      image: product.imageUrl || '',
+      savesCO2: item.discountPct ? (item.discountPct * 0.1).toFixed(1) : '0.5',
+    });
+    setAddedToCart(true);
+    setTimeout(() => setAddedToCart(false), 2000);
   };
 
   if (isLoading) {
@@ -290,16 +308,19 @@ export default function ProductDetail() {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <button
-                        onClick={handleBuy}
-                        disabled={buying}
-                        className="w-full bg-primary-container hover:opacity-90 active:scale-95 transition-all text-amazon-dark font-label-bold py-3 rounded shadow-sm disabled:opacity-50"
+                        onClick={handleAddToCart}
+                        className={`w-full font-label-bold py-3 rounded shadow-sm transition-all active:scale-95 ${
+                          addedToCart
+                            ? 'bg-[#2DC071] text-white'
+                            : 'bg-[#FFD814] border border-[#FCD200] hover:bg-[#F7CA00] text-[#0F1111]'
+                        }`}
                       >
-                        {buying ? 'Processing...' : 'Add to Cart'}
+                        {addedToCart ? '✓ Added to Cart!' : 'Add to Cart'}
                       </button>
                       <button
                         onClick={handleBuy}
                         disabled={buying}
-                        className="w-full bg-[#FFA41C] hover:opacity-90 active:scale-95 transition-all text-amazon-dark font-label-bold py-3 rounded shadow-sm disabled:opacity-50"
+                        className="w-full bg-[#FFA41C] hover:opacity-90 active:scale-95 transition-all text-[#0F1111] font-label-bold py-3 rounded shadow-sm disabled:opacity-50"
                       >
                         {buying ? 'Processing...' : 'Buy Now'}
                       </button>
