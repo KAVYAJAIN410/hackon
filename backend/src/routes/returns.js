@@ -46,6 +46,28 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'A return already exists for this order' });
     }
 
+    // --- DeliveryAssociate Assignment Logic ---
+    let assignedPickupAssociateId = null;
+    if (user.nearestDcId) {
+      // Find an available delivery associate from the user's nearest DC
+      const availableDriver = await prisma.deliveryAssociate.findFirst({
+        where: {
+          assignedDcId: user.nearestDcId,
+          currentStatus: 'AVAILABLE'
+        }
+      });
+
+      if (availableDriver) {
+        assignedPickupAssociateId = availableDriver.id;
+        
+        // Update their status to ON_DELIVERY so they aren't double-booked
+        await prisma.deliveryAssociate.update({
+          where: { id: availableDriver.id },
+          data: { currentStatus: 'ON_DELIVERY' }
+        });
+      }
+    }
+
     // Create return record — status INITIATED, no route decision yet
     // Route will be decided automatically after AI grading
     const returnRecord = await prisma.return.create({
@@ -56,6 +78,7 @@ router.post('/', async (req, res) => {
         status: 'INITIATED',
         refundAmount: order.product.mrp,
         currentDcId: user.nearestDcId,
+        pickupAssociateId: assignedPickupAssociateId,
       },
       include: {
         order: { include: { product: true } },
