@@ -62,7 +62,7 @@ export function UserProvider({ children }) {
         <UserDetailModal
           user={currentUser}
           onClose={() => setShowUserModal(false)}
-          onLogout={() => { logout(); setShowUserModal(false); }}
+          onLogout={() => { logout(); setShowUserModal(false); window.location.href = '/'; }}
         />
       )}
     </UserContext.Provider>
