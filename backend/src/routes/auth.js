@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { v4: uuidv4 } = require('uuid');
 const { prisma } = require('../lib/db');
 const { JWT_SECRET } = require('../middleware/auth');
 
@@ -32,6 +33,7 @@ router.post('/register', async (req, res) => {
 
       const user = await tx.user.create({
         data: {
+          id: uuidv4(),
           name,
           email,
           city,
