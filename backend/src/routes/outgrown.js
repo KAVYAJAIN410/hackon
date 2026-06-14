@@ -2,14 +2,16 @@ const router = require('express').Router();
 const { prisma } = require('../lib/db');
 const { GREEN_CREDITS, getTierForCredits } = require('../lib/constants');
 const { getDemandSignal } = require('../lib/routing');
+const { authenticate } = require('../middleware/auth');
 
 // POST /api/outgrown — list a delivered product for resale (Outgrown It)
-router.post('/', async (req, res) => {
+router.post('/', authenticate, async (req, res) => {
   try {
-    const { orderId, userId, conditionLabel } = req.body;
+    const userId = req.user.id;
+    const { orderId, conditionLabel } = req.body;
 
-    if (!orderId || !userId) {
-      return res.status(400).json({ error: 'orderId and userId are required' });
+    if (!orderId) {
+      return res.status(400).json({ error: 'orderId is required' });
     }
 
     // Verify order exists, belongs to user, and is DELIVERED

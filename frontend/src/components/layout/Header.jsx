@@ -10,7 +10,6 @@ const baseNavLinks = [
   { to: '/green-profile', label: 'Impact Hub' },
   { to: '/return-flow', label: 'Return' },
   { to: '/my-returns', label: 'My Returns' },
-  { to: '/seller-dashboard', label: 'Seller Dashboard' },
 ];
 
 export default function Header() {
@@ -19,10 +18,16 @@ export default function Header() {
   const { currentUser, handleProfileClick } = useUser();
   const { totalItems } = useCart();
 
-  const navLinks = currentUser?.role === 'admin'
-    ? [...baseNavLinks, { to: '/admin-dashboard', label: 'Admin' }]
-    : currentUser?.role === 'delivery partner'
+  const isAdmin = currentUser?.role === 'ADMIN' || currentUser?.role === 'admin';
+  const isDelivery = currentUser?.role === 'DELIVERY_PARTNER' || currentUser?.role === 'delivery partner';
+  const isSeller = currentUser?.role === 'SELLER' || currentUser?.role === 'seller';
+
+  const navLinks = isAdmin
+    ? [{ to: '/admin-dashboard', label: 'Admin Dashboard' }]
+    : isDelivery
     ? [{ to: '/delivery-dashboard', label: 'My Pickups' }]
+    : isSeller
+    ? [{ to: '/seller-dashboard', label: 'Seller Dashboard' }]
     : baseNavLinks;
 
   return (
@@ -58,17 +63,21 @@ export default function Header() {
             )}
           </button>
 
-          <Link to="/green-profile" className="text-[#2DC071] hover:text-[#5be09a] transition-colors" title="Green Profile">
-            <Leaf className="w-5 h-5" />
-          </Link>
-          <Link to="/cart" className="relative text-[#e0e0e0] hover:text-white transition-colors" title="Cart">
-            <ShoppingCart className="w-5 h-5" />
-            {totalItems > 0 && (
-              <span className="absolute -top-2 -right-2 bg-[#FF9900] text-black text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center leading-none">
-                {totalItems > 9 ? '9+' : totalItems}
-              </span>
-            )}
-          </Link>
+          {!isAdmin && !isDelivery && !isSeller && (
+            <>
+              <Link to="/green-profile" className="text-[#2DC071] hover:text-[#5be09a] transition-colors" title="Green Profile">
+                <Leaf className="w-5 h-5" />
+              </Link>
+              <Link to="/cart" className="relative text-[#e0e0e0] hover:text-white transition-colors" title="Cart">
+                <ShoppingCart className="w-5 h-5" />
+                {totalItems > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-[#FF9900] text-black text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center leading-none">
+                    {totalItems > 9 ? '9+' : totalItems}
+                  </span>
+                )}
+              </Link>
+            </>
+          )}
           <button className="md:hidden text-white p-1" onClick={() => setMobileOpen(!mobileOpen)}>
             {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
