@@ -272,11 +272,11 @@ export default function ProductDetail() {
                         <span className="font-bold">{shipping.transferCost === 0 ? 'FREE' : `₹${shipping.transferCost}`}</span>
                       </div>
                       <div className="flex justify-between text-body-sm">
-                        <span className="text-secondary">Last Mile</span>
-                        <span className="font-bold">₹{shipping.lastMile || 0}</span>
+                        <span className="text-secondary">Last Mile Delivery</span>
+                        <span className="font-bold">₹{(shipping.totalShipping || 0) - (shipping.transferCost || 0)}</span>
                       </div>
                       <div className="flex justify-between text-body-sm border-t border-border-subtle pt-2">
-                        <span className="text-secondary font-bold">Total Shipping</span>
+                        <span className="text-secondary font-bold">You Pay</span>
                         <span className="font-bold text-reloop-green">₹{shipping.totalShipping || 0}</span>
                       </div>
                       <div className="flex justify-between text-body-sm">

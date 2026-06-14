@@ -58,8 +58,8 @@ export default function Header() {
             <span className="hidden md:inline font-semibold truncate max-w-[100px]">
               {currentUser?.name?.split(' ')[0] || 'Sign In'}
             </span>
-            {currentUser?.role && (
-              <span className="hidden md:inline text-[9px] text-[#FF9900] uppercase">({currentUser.role})</span>
+            {currentUser?.displayRole && (
+              <span className="hidden md:inline text-[9px] text-[#FF9900] uppercase">({currentUser.displayRole})</span>
             )}
           </button>
 
