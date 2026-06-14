@@ -4,7 +4,7 @@ import { Leaf } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
-export default function ProductCard({ title, price, grade, image, baseValue, logisticsCost, savesCO2 }) {
+export default function ProductCard({ id, title, price, grade, image, baseValue, logisticsCost, savesCO2, isNearYou, estimatedDays }) {
   const gradeColors = {
     'Grade A+': 'bg-reloop-green text-white',
     'Grade B': 'bg-surface-variant text-on-surface-variant',
@@ -25,8 +25,15 @@ export default function ProductCard({ title, price, grade, image, baseValue, log
           <span className={`absolute top-0 right-0 font-label-medium text-[10px] px-2 py-0.5 rounded-bl ${badgeClass}`}>
             {grade}
           </span>
+          {isNearYou && (
+            <span className="absolute top-0 left-0 bg-[#2DC071] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-br">
+              NEAR YOU
+            </span>
+          )}
         </div>
-        <Link to="/product-detail"><Link to="/product-detail"><Link to="/product-detail"><Link to="/product-detail"><h3 className="font-body-md text-link-blue hover:underline cursor-pointer line-clamp-2 mb-1">{title}</h3></Link></Link></Link></Link>
+        <Link to={`/product-detail/${id}`}>
+          <h3 className="font-body-md text-link-blue hover:underline cursor-pointer line-clamp-2 mb-1">{title}</h3>
+        </Link>
         <div className="font-price-lg text-on-surface mb-2 font-medium text-xl">₹{price.toLocaleString()}</div>
         
         <div className="mt-auto">
@@ -36,12 +43,19 @@ export default function ProductCard({ title, price, grade, image, baseValue, log
               <span>Base Value:</span><span>₹{baseValue.toLocaleString()}</span>
             </div>
             <div className="flex justify-between font-body-sm text-[10px] text-on-surface-variant">
-              <span>Logistics & Check:</span><span>+₹{logisticsCost.toLocaleString()}</span>
+              <span>Shipping:</span><span>+₹{logisticsCost.toLocaleString()}</span>
             </div>
+            {estimatedDays && (
+              <div className="flex justify-between font-body-sm text-[10px] text-on-surface-variant mt-1">
+                <span>Delivery:</span><span>{estimatedDays} day{estimatedDays > 1 ? 's' : ''}</span>
+              </div>
+            )}
           </div>
-          <Button className="w-full h-8 bg-gradient-to-b from-[#FFB03B] to-[#FF9900] hover:from-[#f7c06c] hover:to-[#f3a847] border border-[#A88734] rounded-[3px] text-black font-body-md">
-            Add to Cart
-          </Button>
+          <Link to={`/product-detail/${id}`}>
+            <Button className="w-full h-8 bg-gradient-to-b from-[#FFB03B] to-[#FF9900] hover:from-[#f7c06c] hover:to-[#f3a847] border border-[#A88734] rounded-[3px] text-black font-body-md">
+              View Details
+            </Button>
+          </Link>
         </div>
       </div>
       

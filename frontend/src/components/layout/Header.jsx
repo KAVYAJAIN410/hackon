@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Leaf, ShoppingCart, User, Menu, X } from 'lucide-react';
+import { Leaf, ShoppingCart, User, Menu, X, ChevronDown } from 'lucide-react';
+import { useUser } from '../../context/UserContext';
 
 const navLinks = [
   { to: '/outgrown-it', label: 'Trade-In' },
@@ -14,6 +15,20 @@ const navLinks = [
 export default function Header() {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [userDropdownOpen, setUserDropdownOpen] = React.useState(false);
+  const { users, currentUser, setCurrentUser } = useUser();
+  const dropdownRef = React.useRef(null);
+
+  // Close dropdown on outside click
+  React.useEffect(() => {
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setUserDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
     <header className="bg-[#232f3e] sticky top-0 z-50 border-b border-[#37475a] shadow-md">
@@ -45,15 +60,56 @@ export default function Header() {
           })}
         </nav>
 
-        {/* Icon Actions */}
+        {/* Icon Actions + User Selector */}
         <div className="flex items-center space-x-3 md:space-x-4">
+          {/* User Selector Dropdown */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+              className="flex items-center gap-1 text-[#e0e0e0] hover:text-white transition-colors text-[12px] md:text-[13px] border border-transparent hover:border-[#37475a] px-2 py-1 rounded"
+            >
+              <span className="hidden md:inline text-[10px] text-[#a0a0a0]">Hello,</span>
+              <span className="font-semibold truncate max-w-[100px]">{currentUser?.name?.split(' ')[0] || 'User'}</span>
+              <ChevronDown className="w-3 h-3" />
+            </button>
+            {userDropdownOpen && users.length > 0 && (
+              <div className="absolute right-0 top-full mt-1 w-56 bg-white border border-[#D5D9D9] rounded-lg shadow-xl z-[100] overflow-hidden">
+                <div className="px-3 py-2 bg-[#F7F8F8] border-b border-[#D5D9D9]">
+                  <p className="text-[11px] font-bold text-[#565959] uppercase tracking-wider">Switch User (Demo)</p>
+                </div>
+                <div className="max-h-60 overflow-y-auto">
+                  {users.map((user) => (
+                    <button
+                      key={user.id}
+                      onClick={() => {
+                        setCurrentUser(user);
+                        setUserDropdownOpen(false);
+                      }}
+                      className={`w-full text-left px-3 py-2 text-[13px] hover:bg-[#F7F8F8] transition-colors flex items-center justify-between ${
+                        currentUser?.id === user.id ? 'bg-[#F0FDF4] border-l-2 border-[#2DC071]' : ''
+                      }`}
+                    >
+                      <div>
+                        <p className="font-medium text-[#0F1111]">{user.name}</p>
+                        <p className="text-[11px] text-[#565959]">{user.city} • {user.greenTier}</p>
+                      </div>
+                      {currentUser?.id === user.id && (
+                        <span className="text-[#2DC071] text-[11px] font-bold">✓</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
           <Link to="/green-profile" className="text-[#2DC071] hover:text-[#5be09a] transition-colors" title="Green Profile">
             <Leaf className="w-5 h-5" />
           </Link>
           <Link to="/marketplace" className="text-[#e0e0e0] hover:text-white transition-colors" title="Cart">
             <ShoppingCart className="w-5 h-5" />
           </Link>
-          <Link to="/outgrown-it" className="text-[#e0e0e0] hover:text-white transition-colors" title="Account">
+          <Link to="/admin-dashboard" className="text-[#e0e0e0] hover:text-white transition-colors" title="Admin">
             <User className="w-5 h-5" />
           </Link>
           {/* Mobile hamburger */}
