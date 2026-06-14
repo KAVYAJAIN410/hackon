@@ -27,11 +27,24 @@ async function request(method, path, body = null) {
   return res.json();
 }
 
+async function postFormData(path, formData) {
+  const res = await fetch(`${BASE_URL}${path}`, {
+    method: 'POST',
+    body: formData, // browser sets multipart boundary automatically
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: res.statusText }));
+    throw new Error(err.message || `Request failed: ${res.status}`);
+  }
+  return res.json();
+}
+
 const api = {
   get:    (path)         => request('GET',    path),
   post:   (path, body)   => request('POST',   path, body),
   put:    (path, body)   => request('PUT',    path, body),
   delete: (path)         => request('DELETE', path),
+  postFormData: (path, formData) => postFormData(path, formData),
 };
 
 export default api;
