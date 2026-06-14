@@ -189,17 +189,17 @@ export default function DeliveryDashboard() {
   const [selected, setSelected]   = useState(null);
 
   useEffect(() => {
-    // Fetch all returns pending pickup — filter INITIATED/ROUTED status client-side
-    api.get('/returns')
+    if (!currentUser) return;
+    
+    // Fetch returns dynamically filtered by this associate's ID
+    api.get(`/returns/by-associate?associate_id=${currentUser.id}`)
       .then(data => {
-        const pending = Array.isArray(data)
-          ? data.filter(r => ['INITIATED', 'ROUTED'].includes(r.status))
-          : [];
+        const pending = Array.isArray(data) ? data : [];
         setOrders(pending);
       })
       .catch(() => setOrders([]))
       .finally(() => setLoading(false));
-  }, []);
+  }, [currentUser]);
 
   // Guard: only delivery partners can access
   if (currentUser && currentUser.role !== 'delivery partner') {

@@ -124,6 +124,26 @@ router.get('/', async (req, res) => {
   }
 });
 
+// GET /api/returns/by-associate — fetch returns assigned to a delivery associate
+router.get('/by-associate', async (req, res) => {
+  const { associate_id } = req.query;
+  if (!associate_id) return res.status(400).json({ error: 'associate_id required' });
+  try {
+    const returns = await prisma.return.findMany({
+      where: { pickupAssociateId: associate_id, status: { in: ['INITIATED', 'ROUTED'] } },
+      include: {
+        order: { include: { product: true } },
+        user: true,
+        grading: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+    res.json(returns);
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to fetch assigned pickups' });
+  }
+});
+
 // GET /api/returns/:id — fetch single return with full details
 router.get('/:id', async (req, res) => {
   try {
