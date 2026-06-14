@@ -5,7 +5,7 @@ import EmptyState from '../ui/EmptyState';
 import api from '../../lib/api';
 import { useUser } from '../../context/UserContext';
 
-export default function ProductGrid() {
+export default function ProductGrid({ filters }) {
   const [isLoading, setIsLoading] = useState(true);
   const [products, setProducts] = useState([]);
   const [error, setError] = useState(null);
@@ -51,7 +51,15 @@ export default function ProductGrid() {
     );
   }
 
-  if (!products || products.length === 0) {
+  const filtered = (products || []).filter(item => {
+    const gradeOk = !filters?.grades?.length || filters.grades.includes(item.grade);
+    const price = parseFloat(item.sellingPrice) || 0;
+    const [min, max] = filters?.priceRange || [0, Infinity];
+    const priceOk = !filters?.priceRange || (price >= min && price <= max);
+    return gradeOk && priceOk;
+  });
+
+  if (!filtered || filtered.length === 0) {
     return (
       <section className="flex-grow">
         <EmptyState
@@ -67,7 +75,7 @@ export default function ProductGrid() {
   return (
     <section className="flex-grow">
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3">
-        {products.map(item => (
+        {filtered.map(item => (
           <ProductCard
             key={item.id}
             id={item.id}

@@ -14,6 +14,8 @@ import MyReturns from './pages/MyReturns';
 import GreenProfile from './pages/GreenProfile';
 import AdminDashboard from './pages/AdminDashboard';
 
+import DeliveryDashboard from './pages/DeliveryDashboard';
+
 function App() {
   return (
     <UserProvider>
@@ -31,6 +33,7 @@ function App() {
           <Route path="/green-profile" element={<GreenProfile />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/delivery-dashboard" element={<DeliveryDashboard />} />
         </Routes>
       </Router>
       </CartProvider>

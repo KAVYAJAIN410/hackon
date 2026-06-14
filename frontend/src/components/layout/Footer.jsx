@@ -12,15 +12,15 @@ export default function Footer() {
           </p>
         </div>
         <div className="flex flex-col gap-2">
-          <Link to="#" className="text-gray-400 hover:text-white font-label-bold text-sm cursor-pointer hover:underline">Sustainability Standards</Link>
-          <Link to="#" className="text-gray-400 hover:text-white font-label-bold text-sm cursor-pointer hover:underline">Circular Economy Impact</Link>
+          <Link to="/marketplace" className="text-gray-400 hover:text-white font-label-bold text-sm cursor-pointer hover:underline">Sustainability Standards</Link>
+          <Link to="/green-profile" className="text-gray-400 hover:text-white font-label-bold text-sm cursor-pointer hover:underline">Circular Economy Impact</Link>
         </div>
         <div className="flex flex-col gap-2">
-          <Link to="#" className="text-gray-400 hover:text-white font-label-bold text-sm cursor-pointer hover:underline">Trade-In Terms</Link>
-          <Link to="#" className="text-gray-400 hover:text-white font-label-bold text-sm cursor-pointer hover:underline">Carbon Footprint Help</Link>
+          <Link to="/outgrown-it" className="text-gray-400 hover:text-white font-label-bold text-sm cursor-pointer hover:underline">Trade-In Terms</Link>
+          <Link to="/green-profile" className="text-gray-400 hover:text-white font-label-bold text-sm cursor-pointer hover:underline">Carbon Footprint Help</Link>
         </div>
         <div className="flex flex-col gap-2">
-          <Link to="#" className="text-gray-400 hover:text-white font-label-bold text-sm cursor-pointer hover:underline">Contact ReLoop</Link>
+          <Link to="/admin-dashboard" className="text-gray-400 hover:text-white font-label-bold text-sm cursor-pointer hover:underline">Contact ReLoop</Link>
         </div>
       </div>
     </footer>
