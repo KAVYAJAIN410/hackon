@@ -12,6 +12,22 @@ export default function MyReturns() {
   const [selectedReturn, setSelectedReturn] = useState(null);
   const { currentUser } = useUser();
 
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-[#f8f9fa] flex flex-col">
+        <Header />
+        <main className="flex-grow flex items-center justify-center text-center px-4">
+          <div>
+            <span className="material-symbols-outlined text-5xl text-[#565959] block mb-3">account_circle</span>
+            <h2 className="text-xl font-bold text-[#0F1111] mb-2">Sign in to continue</h2>
+            <p className="text-[#565959]">Please sign in to view your returns.</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   useEffect(() => {
     if (!currentUser) return;
     setIsLoading(true);
@@ -131,14 +147,17 @@ export default function MyReturns() {
                 >
                   <div className="flex gap-4">
                     <div className="w-16 h-16 bg-[#f0f2f2] rounded overflow-hidden flex-shrink-0 flex items-center justify-center">
-                      <span className="material-symbols-outlined text-[#565959] text-[28px]">inventory_2</span>
+                      {(ret.order?.product || ret.product)?.imageUrl
+                        ? <img src={(ret.order?.product || ret.product).imageUrl} alt="" className="w-full h-full object-cover" />
+                        : <span className="material-symbols-outlined text-[#565959] text-[28px]">inventory_2</span>
+                      }
                     </div>
                     <div className="flex-1">
                       <div className="flex justify-between items-start">
                         <span className="text-[11px] uppercase tracking-wider font-bold text-[#565959]">ID: {ret.id}</span>
                         <span className={`text-[11px] uppercase font-bold ${getStatusColor(ret.status)}`}>{ret.status}</span>
                       </div>
-                      <h3 className="text-[14px] font-bold mt-1">{ret.product?.name || 'Product'}</h3>
+                      <h3 className="text-[14px] font-bold mt-1">{(ret.order?.product || ret.product)?.name || 'Product'}</h3>
                       <p className="text-[13px] text-[#565959]">Reason: {ret.reason?.replace('_', ' ')}</p>
                     </div>
                   </div>
@@ -165,14 +184,17 @@ export default function MyReturns() {
                     >
                       <div className="flex gap-4">
                         <div className="w-16 h-16 bg-[#f0f2f2] rounded overflow-hidden flex-shrink-0 flex items-center justify-center">
-                          <span className="material-symbols-outlined text-[#565959] text-[28px]">inventory_2</span>
+                          {(ret.order?.product || ret.product)?.imageUrl
+                            ? <img src={(ret.order?.product || ret.product).imageUrl} alt="" className="w-full h-full object-cover" />
+                            : <span className="material-symbols-outlined text-[#565959] text-[28px]">inventory_2</span>
+                          }
                         </div>
                         <div className="flex-1">
                           <div className="flex justify-between items-start">
                             <span className="text-[11px] uppercase tracking-wider font-bold text-[#565959]">ID: {ret.id}</span>
                             <span className="text-[11px] uppercase font-bold text-[#565959]">{ret.status}</span>
                           </div>
-                          <h3 className="text-[14px] font-bold mt-1">{ret.product?.name || 'Product'}</h3>
+                          <h3 className="text-[14px] font-bold mt-1">{(ret.order?.product || ret.product)?.name || 'Product'}</h3>
                         </div>
                       </div>
                     </div>
@@ -198,7 +220,7 @@ export default function MyReturns() {
                           </span>
                         </div>
                         <p className="text-body-md text-secondary">
-                          {selectedReturn.product?.name || 'Product'} • Reason: {selectedReturn.reason?.replace('_', ' ')}
+                          {(selectedReturn.order?.product || selectedReturn.product)?.name || 'Product'} • Reason: {selectedReturn.reason?.replace('_', ' ')}
                         </p>
                       </div>
                     </div>

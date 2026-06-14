@@ -12,17 +12,12 @@ export default function ProductGrid({ filters }) {
   const { currentUser } = useUser();
 
   useEffect(() => {
-    if (!currentUser) return;
     setIsLoading(true);
     setError(null);
-    api.get(`/marketplace?user_id=${currentUser.id}`)
-      .then((data) => {
-        setProducts(data);
-      })
-      .catch((err) => {
-        console.error('Failed to load marketplace:', err);
-        setError(err.message);
-      })
+    const url = currentUser ? `/marketplace?user_id=${currentUser.id}` : '/marketplace';
+    api.get(url)
+      .then((data) => setProducts(data))
+      .catch((err) => { console.error('Failed to load marketplace:', err); setError(err.message); })
       .finally(() => setIsLoading(false));
   }, [currentUser?.id]);
 
@@ -59,7 +54,7 @@ export default function ProductGrid({ filters }) {
     return gradeOk && priceOk;
   });
 
-  if (!filtered || filtered.length === 0) {
+  if (!isLoading && (!filtered || filtered.length === 0)) {
     return (
       <section className="flex-grow">
         <EmptyState

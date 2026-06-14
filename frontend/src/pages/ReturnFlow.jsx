@@ -8,9 +8,10 @@ import api from '../lib/api';
 
 const REASON_MAP = {
   'Too small / Tight fit': 'SIZE_FIT',
-  "Doesn't match description": 'DOESNT_MATCH',
-  'Performance not as expected': 'PERFORMANCE',
-  'Found a better price elsewhere': 'BETTER_PRICE',
+  "Doesn't match description": 'NOT_AS_DESCRIBED',
+  'Defective or damaged': 'DEFECTIVE',
+  'Changed my mind': 'CHANGED_MIND',
+  'Quality not as expected': 'QUALITY',
 };
 
 export default function ReturnFlow() {
@@ -18,6 +19,22 @@ export default function ReturnFlow() {
   const navigate = useNavigate();
   const { currentUser } = useUser();
   const fileInputRef = useRef(null);
+
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-[#f8f9fa] flex flex-col">
+        <Header />
+        <main className="flex-grow flex items-center justify-center text-center px-4">
+          <div>
+            <span className="material-symbols-outlined text-5xl text-[#565959] block mb-3">account_circle</span>
+            <h2 className="text-xl font-bold text-[#0F1111] mb-2">Sign in to continue</h2>
+            <p className="text-[#565959]">Please sign in to start a return.</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   // Data state
   const [orders, setOrders] = useState([]);
@@ -107,7 +124,7 @@ export default function ReturnFlow() {
   };
 
   const handleBack = () => {
-    if (step > 1) setStep(step - 1);
+    if (step > 1 && step < 4) setStep(step - 1);
   };
 
   const handleCancel = () => {
@@ -372,7 +389,7 @@ export default function ReturnFlow() {
                 <div className="mt-auto border-t border-[#D5D9D9] p-4 bg-[#F7F8F8] flex justify-between items-center rounded-b-lg">
                   <button
                     onClick={handleBack}
-                    className={`px-4 py-1.5 bg-white border border-[#D5D9D9] text-[#0F1111] text-sm font-medium rounded-lg shadow-sm hover:bg-[#F7F8F8] transition-all ${step === 1 || processing ? 'invisible' : ''}`}
+                    className={`px-4 py-1.5 bg-white border border-[#D5D9D9] text-[#0F1111] text-sm font-medium rounded-lg shadow-sm hover:bg-[#F7F8F8] transition-all ${step === 1 || step >= 4 || processing ? 'invisible' : ''}`}
                   >
                     Back
                   </button>

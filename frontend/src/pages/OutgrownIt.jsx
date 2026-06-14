@@ -11,8 +11,9 @@ export default function OutgrownIt() {
   const [isLoading, setIsLoading] = useState(true);
   const [orders, setOrders] = useState([]);
   const [error, setError] = useState(null);
-  const [listingOrder, setListingOrder] = useState(null); // order being listed
+  const [listingOrder, setListingOrder] = useState(null);
   const [listingResult, setListingResult] = useState(null);
+  const [listingError, setListingError] = useState(null);
   const { currentUser } = useUser();
 
   useEffect(() => {
@@ -27,22 +28,33 @@ export default function OutgrownIt() {
   const handleListOutgrown = async (order) => {
     if (!currentUser) return;
     setListingOrder(order.id);
+    setListingError(null);
     try {
-      const result = await api.post('/outgrown', {
-        orderId: order.id,
-        userId: currentUser.id,
-      });
+      const result = await api.post('/outgrown', { orderId: order.id, userId: currentUser.id });
       setListingResult(result);
-      // Update the order in the list to reflect it's been listed
-      setOrders(prev => prev.map(o =>
-        o.id === order.id ? { ...o, hasActiveOutgrown: true } : o
-      ));
+      setOrders(prev => prev.map(o => o.id === order.id ? { ...o, hasActiveOutgrown: true } : o));
     } catch (err) {
-      alert('Failed to list item: ' + err.message);
+      setListingError(err.message || 'Failed to list item');
     } finally {
       setListingOrder(null);
     }
   };
+
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-[#f8f9fa] flex flex-col">
+        <Header />
+        <main className="flex-grow flex items-center justify-center text-center px-4">
+          <div>
+            <span className="material-symbols-outlined text-5xl text-[#565959] block mb-3">account_circle</span>
+            <h2 className="text-xl font-bold text-[#0F1111] mb-2">Sign in to view your orders</h2>
+            <p className="text-[#565959]">You need to be signed in to use Trade-In.</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -114,6 +126,12 @@ export default function OutgrownIt() {
             </div>
 
             {/* Listing Success Banner */}
+            {listingError && (
+              <div className="mb-4 bg-red-50 border border-red-200 rounded p-3 text-sm text-red-700 flex justify-between items-center">
+                <span>Failed to list item: {listingError}</span>
+                <button onClick={() => setListingError(null)} className="text-red-500 hover:text-red-700 ml-4">✕</button>
+              </div>
+            )}
             {listingResult && (
               <div className="mb-6 bg-[#F0FDF4] border border-[#2DC071]/30 rounded-lg p-4">
                 <div className="flex items-start gap-3">

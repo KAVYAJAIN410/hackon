@@ -11,6 +11,22 @@ export default function GreenProfile() {
   const [profile, setProfile] = useState(null);
   const { currentUser } = useUser();
 
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-[#f8f9fa] flex flex-col">
+        <Header />
+        <main className="flex-grow flex items-center justify-center text-center px-4">
+          <div>
+            <span className="material-symbols-outlined text-5xl text-[#565959] block mb-3">account_circle</span>
+            <h2 className="text-xl font-bold text-[#0F1111] mb-2">Sign in to view your Green Profile</h2>
+            <p className="text-[#565959]">Track your environmental impact and green credits.</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   useEffect(() => {
     if (!currentUser) return;
     setIsLoading(true);
@@ -140,15 +156,11 @@ export default function GreenProfile() {
                 {/* Actions */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-4">
                   <h3 className="font-headline-sm text-headline-sm text-on-surface">Ways to Earn</h3>
-                  <Link to="/outgrown-it">
-                    <button className="w-full bg-reloop-green text-white font-label-bold text-label-bold py-2 px-4 flex items-center justify-center gap-2 hover:bg-green-700 transition-colors rounded mb-2">
-                      <span className="material-symbols-outlined text-sm">recycling</span> Start a Trade-In
-                    </button>
+                  <Link to="/outgrown-it" className="w-full bg-reloop-green text-white font-label-bold text-label-bold py-2 px-4 flex items-center justify-center gap-2 hover:bg-green-700 transition-colors rounded mb-2">
+                    <span className="material-symbols-outlined text-sm">recycling</span> Start a Trade-In
                   </Link>
-                  <Link to="/marketplace">
-                    <button className="w-full bg-surface border border-border-standard font-label-bold text-label-bold py-2 px-4 text-on-surface flex items-center justify-center gap-2 hover:bg-surface-variant transition-colors rounded">
-                      <span className="material-symbols-outlined text-sm">local_mall</span> Shop Certified Refurbished
-                    </button>
+                  <Link to="/marketplace" className="w-full bg-surface border border-border-standard font-label-bold text-label-bold py-2 px-4 text-on-surface flex items-center justify-center gap-2 hover:bg-surface-variant transition-colors rounded">
+                    <span className="material-symbols-outlined text-sm">local_mall</span> Shop Certified Refurbished
                   </Link>
                 </div>
               </div>

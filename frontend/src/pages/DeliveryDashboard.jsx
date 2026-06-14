@@ -31,7 +31,7 @@ function OrderList({ orders, loading, onSelect }) {
         >
           <div className="flex justify-between items-start">
             <div>
-              <p className="font-bold text-[#0F1111] text-sm">{o.product?.name || o.id}</p>
+              <p className="font-bold text-[#0F1111] text-sm">{o.order?.product?.name || o.id}</p>
               <p className="text-xs text-[#565959] mt-0.5">{o.user?.name} • {o.user?.city}</p>
               <p className="text-xs text-[#565959] mt-0.5">Reason: {o.reason?.replace(/_/g, ' ')}</p>
             </div>
@@ -127,12 +127,12 @@ function OrderDetail({ order, onBack, onComplete }) {
       <div className="bg-white border border-[#D5D9D9] rounded-lg p-5 shadow-sm">
         <h2 className="font-bold text-[#0F1111] text-lg mb-4">Pickup Details</h2>
         <div className="flex gap-4 mb-4">
-          {order.product?.imageUrl
-            ? <img src={order.product.imageUrl} alt={order.product.name} className="w-20 h-20 object-cover rounded border border-[#D5D9D9]" />
+          {(order.order?.product || order.product)?.imageUrl
+            ? <img src={(order.order?.product || order.product).imageUrl} alt={(order.order?.product || order.product).name} className="w-20 h-20 object-cover rounded border border-[#D5D9D9]" />
             : <div className="w-20 h-20 bg-[#EAEDED] rounded flex items-center justify-center"><span className="material-symbols-outlined text-[#565959]">inventory_2</span></div>
           }
           <div className="text-sm space-y-1">
-            <p className="font-bold text-[#0F1111]">{order.product?.name || order.id}</p>
+            <p className="font-bold text-[#0F1111]">{(order.order?.product || order.product)?.name || order.id}</p>
             <p className="text-[#565959]">Customer: <span className="font-medium">{order.user?.name}</span></p>
             <p className="text-[#565959]">Address: <span className="font-medium">{order.user?.city}</span></p>
             <p className="text-[#565959]">Return ID: <span className="font-medium">{order.id}</span></p>
