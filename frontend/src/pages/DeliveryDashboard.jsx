@@ -202,7 +202,7 @@ export default function DeliveryDashboard() {
   }, [currentUser]);
 
   // Guard: only delivery partners can access
-  if (currentUser && currentUser.role !== 'delivery partner') {
+  if (currentUser && currentUser.role !== 'DELIVERY_PARTNER') {
     return (
       <div className="min-h-screen bg-[#f8f9fa] flex flex-col">
         <Header />

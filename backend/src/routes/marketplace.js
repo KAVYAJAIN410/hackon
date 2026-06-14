@@ -2,18 +2,16 @@ const router = require('express').Router();
 const { prisma } = require('../lib/db');
 const { calculateDeliveryCost, calculateViability } = require('../lib/costing');
 const { GRADE_CONFIG, GREEN_CREDITS, COSTS } = require('../lib/constants');
+const { authenticate } = require('../middleware/auth');
 
-// GET /api/marketplace?user_id= — fetch available inventory with per-buyer pricing
-router.get('/', async (req, res) => {
+// GET /api/marketplace — fetch available inventory with per-buyer pricing
+router.get('/', authenticate, async (req, res) => {
   try {
-    const { user_id } = req.query;
-    if (!user_id) {
-      return res.status(400).json({ error: 'user_id query parameter is required' });
-    }
+    const userId = req.user.id;
 
     // Fetch buyer info
     const buyer = await prisma.user.findUnique({
-      where: { id: user_id },
+      where: { id: userId },
       include: { nearestDc: true },
     });
     if (!buyer) {
@@ -91,17 +89,14 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/marketplace/:id?user_id= — single item detail with full pricing + health card
-router.get('/:id', async (req, res) => {
+// GET /api/marketplace/:id — single item detail with full pricing + health card
+router.get('/:id', authenticate, async (req, res) => {
   try {
     const { id } = req.params;
-    const { user_id } = req.query;
-    if (!user_id) {
-      return res.status(400).json({ error: 'user_id query parameter is required' });
-    }
+    const userId = req.user.id;
 
     const buyer = await prisma.user.findUnique({
-      where: { id: user_id },
+      where: { id: userId },
       include: { nearestDc: true },
     });
     if (!buyer) {
@@ -177,14 +172,10 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST /api/marketplace/:id/buy — purchase an item
-router.post('/:id/buy', async (req, res) => {
+router.post('/:id/buy', authenticate, async (req, res) => {
   try {
     const { id } = req.params;
-    const { buyerId } = req.body;
-
-    if (!buyerId) {
-      return res.status(400).json({ error: 'buyerId is required' });
-    }
+    const buyerId = req.user.id;
 
     // Verify buyer exists
     const buyer = await prisma.user.findUnique({

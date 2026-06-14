@@ -1,21 +1,19 @@
 const router = require('express').Router();
 const { prisma } = require('../lib/db');
+const { authenticate } = require('../middleware/auth');
 
-// GET /api/orders?user_id= — fetch user's orders with outgrown eligibility
-router.get('/', async (req, res) => {
+// GET /api/orders — fetch user's orders with outgrown eligibility
+router.get('/', authenticate, async (req, res) => {
   try {
-    const { user_id } = req.query;
-    if (!user_id) {
-      return res.status(400).json({ error: 'user_id query parameter is required' });
-    }
+    const userId = req.user.id;
 
-    const user = await prisma.user.findUnique({ where: { id: user_id } });
+    const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
     const orders = await prisma.order.findMany({
-      where: { userId: user_id },
+      where: { userId },
       include: {
         product: true,
         returns: { select: { id: true } },

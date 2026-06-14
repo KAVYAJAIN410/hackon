@@ -1,14 +1,16 @@
 const router = require('express').Router();
 const { prisma } = require('../lib/db');
+const { authenticate } = require('../middleware/auth');
 
-// POST /api/returns — initiate a return (simplified: no user choice for route)
-router.post('/', async (req, res) => {
+// POST /api/returns — initiate a return
+router.post('/', authenticate, async (req, res) => {
   try {
-    const { orderId, userId, reason } = req.body;
+    const userId = req.user.id;
+    const { orderId, reason } = req.body;
 
     // Validate required fields
-    if (!orderId || !userId || !reason) {
-      return res.status(400).json({ error: 'orderId, userId, and reason are required' });
+    if (!orderId || !reason) {
+      return res.status(400).json({ error: 'orderId and reason are required' });
     }
 
     // Validate reason
@@ -98,16 +100,13 @@ router.post('/', async (req, res) => {
   }
 });
 
-// GET /api/returns?user_id= — fetch all returns for a user
-router.get('/', async (req, res) => {
+// GET /api/returns — fetch all returns for the authenticated user
+router.get('/', authenticate, async (req, res) => {
   try {
-    const { user_id } = req.query;
-    if (!user_id) {
-      return res.status(400).json({ error: 'user_id query parameter is required' });
-    }
+    const userId = req.user.id;
 
     const returns = await prisma.return.findMany({
-      where: { userId: user_id },
+      where: { userId },
       include: {
         order: { include: { product: true } },
         currentDc: true,

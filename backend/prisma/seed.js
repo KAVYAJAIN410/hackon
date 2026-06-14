@@ -9,10 +9,13 @@ async function main() {
   await prisma.marketplaceOrder.deleteMany();
   await prisma.inventoryItem.deleteMany();
   await prisma.gradeConfig.deleteMany();
+  await prisma.aiGrading.deleteMany();
+  await prisma.returnImage.deleteMany();
   await prisma.return.deleteMany();
   await prisma.order.deleteMany();
   await prisma.dcRoute.deleteMany();
   await prisma.user.deleteMany();
+  await prisma.loginCredentials.deleteMany();
   await prisma.product.deleteMany();
   await prisma.deliveryCenter.deleteMany();
 
@@ -159,6 +162,28 @@ async function main() {
 
   await prisma.user.createMany({ data: users });
   console.log(`  ✓ Created ${users.length} users`);
+
+  // ─── Login Credentials (password: "password123" for all demo users) ───
+  const bcrypt = require('bcryptjs');
+  const passwordHash = await bcrypt.hash('password123', 10);
+
+  const loginCredentials = users.map(u => ({
+    id: `login-${u.id}`,
+    email: u.email,
+    passwordHash,
+    role: 'CUSTOMER',
+  }));
+
+  await prisma.loginCredentials.createMany({ data: loginCredentials });
+
+  // Link users to their login credentials
+  for (const u of users) {
+    await prisma.user.update({
+      where: { id: u.id },
+      data: { loginId: `login-${u.id}` },
+    });
+  }
+  console.log(`  ✓ Created ${loginCredentials.length} login credentials (password: password123)`);
 
   // ─── 19 Orders ───
   const orders = [

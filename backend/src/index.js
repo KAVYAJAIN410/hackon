@@ -24,6 +24,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // Mount routes
+app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/stats', require('./routes/stats'));
 app.use('/api/marketplace', require('./routes/marketplace'));
