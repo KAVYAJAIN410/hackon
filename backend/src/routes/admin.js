@@ -102,7 +102,7 @@ router.get('/overview', async (req, res) => {
     const recentReturns = await prisma.return.findMany({
       include: {
         order: { include: { product: true } },
-        grading: true,
+        gradings: true,
         currentDc: true,
         user: true,
       },

@@ -189,7 +189,7 @@ export default function DeliveryDashboard() {
   const [selected, setSelected]   = useState(null);
 
   useEffect(() => {
-    if (!currentUser) return;
+ 
     
     // Fetch returns dynamically filtered by this associate's ID
     api.get(`/returns/by-associate?associate_id=${currentUser.id}`)

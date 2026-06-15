@@ -10,15 +10,17 @@ const s3 = new S3Client({
 });
 
 async function uploadToS3(buffer, mimeType, folder = 'returns') {
+  const bucket = process.env.S3_BUCKET_NAME || process.env.S3_BUCKET;
+  const region = process.env.AWS_REGION;
   const ext = mimeType.split('/')[1];
   const key = `${folder}/${uuidv4()}.${ext}`;
   await s3.send(new PutObjectCommand({
-    Bucket: process.env.S3_BUCKET_NAME,
+    Bucket: bucket,
     Key: key,
     Body: buffer,
     ContentType: mimeType,
   }));
-  return `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+  return `https://${bucket}.s3.${region}.amazonaws.com/${key}`;
 }
 
 module.exports = { uploadToS3 };

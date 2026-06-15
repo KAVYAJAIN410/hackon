@@ -9,6 +9,7 @@ async function main() {
   await prisma.marketplaceOrder.deleteMany();
   await prisma.inventoryItem.deleteMany();
   await prisma.gradeConfig.deleteMany();
+  await prisma.finalGrading.deleteMany();
   await prisma.aiGrading.deleteMany();
   await prisma.returnImage.deleteMany();
   await prisma.return.deleteMany();
@@ -193,7 +194,7 @@ async function main() {
 
     // Rohan's orders (Gurgaon → Delhi DC)
     { id: 'ord-003', userId: 'user-002', productId: 'prod-001', status: 'RETURN_REQUESTED', orderedAt: new Date('2025-05-10') },  // Samsung phone
-    { id: 'ord-004', userId: 'user-002', productId: 'prod-003', status: 'RETURN_REQUESTED', orderedAt: new Date('2025-05-22') },  // boAt earbuds
+    { id: 'ord-004', userId: 'user-002', productId: 'prod-003', : 'RETURN_REQUESTED', orderedAt: new Date('2025-05-22') },  // boAt earbuds
     { id: 'ord-005', userId: 'user-002', productId: 'prod-007', status: 'RETURN_REQUESTED', orderedAt: new Date('2025-05-25') },  // Ambrane power bank
 
     // Vikram's orders (Mumbai)

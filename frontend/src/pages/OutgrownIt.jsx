@@ -19,7 +19,7 @@ export default function OutgrownIt() {
   useEffect(() => {
     if (!currentUser) return;
     setIsLoading(true);
-    api.get(`/orders?user_id=${currentUser.id}`)
+    api.get('/orders')
       .then(setOrders)
       .catch((err) => setError(err.message))
       .finally(() => setIsLoading(false));
@@ -30,7 +30,7 @@ export default function OutgrownIt() {
     setListingOrder(order.id);
     setListingError(null);
     try {
-      const result = await api.post('/outgrown', { orderId: order.id, userId: currentUser.id });
+      const result = await api.post('/outgrown', { orderId: order.id });
       setListingResult(result);
       setOrders(prev => prev.map(o => o.id === order.id ? { ...o, hasActiveOutgrown: true } : o));
     } catch (err) {
@@ -161,7 +161,7 @@ export default function OutgrownIt() {
                 const isListing = listingOrder === order.id;
 
                 return (
-                  <div key={order.id} className={`border border-border-subtle rounded-lg bg-white overflow-hidden shadow-sm ${!isEligible ? 'opacity-60' : ''}`}>
+                  <div key={order.id} className={`border border-border-subtle rounded-lg bg-white overflow-hidden shadow-sm ${!isEligible && order.source !== 'REFURBISHED' ? 'opacity-60' : ''}`}>
                     {/* Order header */}
                     <div className="bg-surface-container py-3 px-6 flex flex-wrap justify-between items-center text-body-sm font-body-sm text-secondary">
                       <div className="flex gap-10">
@@ -171,15 +171,27 @@ export default function OutgrownIt() {
                         </div>
                         <div className="flex flex-col">
                           <span className="uppercase font-semibold text-[10px]">Total</span>
-                          <span className="text-on-background">₹{parseFloat(product.mrp || 0).toLocaleString()}</span>
+                          <span className="text-on-background">
+                            ₹{parseFloat(order.totalPrice ?? product.mrp ?? 0).toLocaleString()}
+                          </span>
                         </div>
                         <div className="flex flex-col">
                           <span className="uppercase font-semibold text-[10px]">Status</span>
-                          <span className="text-on-background">{order.status}</span>
+                          <span className={`font-bold ${
+                            order.status === 'ONGOING' ? 'text-[#FF9900]' :
+                            order.status === 'DELIVERED' ? 'text-[#067D62]' : 'text-on-background'
+                          }`}>
+                            {order.status === 'ONGOING' ? '🔄 Ongoing' : order.status}
+                          </span>
                         </div>
                       </div>
                       <div className="flex flex-col items-end">
-                        <span className="uppercase font-semibold text-[10px]">Order # {order.id}</span>
+                        <span className="uppercase font-semibold text-[10px]">Order # {order.orderNumber || order.id}</span>
+                        {order.source === 'REFURBISHED' && (
+                          <span className="mt-1 text-[10px] font-bold px-2 py-0.5 bg-[#F0FDF4] text-reloop-green rounded">
+                            ♻️ Certified Refurbished{order.grade ? ` · Grade ${order.grade}` : ''}
+                          </span>
+                        )}
                       </div>
                     </div>
 
@@ -200,26 +212,32 @@ export default function OutgrownIt() {
                           <div className="flex flex-col gap-1">
                             <h3 className="text-title-lg font-title-lg text-primary hover:text-primary-container cursor-pointer">{product.name}</h3>
                             <p className="text-body-sm font-body-sm text-secondary">
-                              {order.status === 'DELIVERED' ? `Delivered ${orderDate}` : `Status: ${order.status}`}
+                              {order.source === 'REFURBISHED'
+                                ? (order.status === 'ONGOING' ? 'Your refurbished order is being processed' : `Status: ${order.status}`)
+                                : order.status === 'DELIVERED' ? `Delivered ${orderDate}` : `Status: ${order.status}`}
                             </p>
                             {order.monthsSinceOrder && (
                               <p className="text-body-sm text-secondary">Owned for {Math.round(order.monthsSinceOrder)} months</p>
                             )}
-                            <div className="mt-4 flex flex-wrap gap-2">
+                            {order.source !== 'REFURBISHED' && (
+                              <div className="mt-4 flex flex-wrap gap-2">
+                                <Link to={`/return-flow`}>
+                                  <button className="bg-white border border-border-subtle px-4 py-1.5 rounded-full text-label-bold font-label-bold shadow-sm hover:bg-surface-container-low active:scale-95 transition-all">
+                                    Return or replace
+                                  </button>
+                                </Link>
+                              </div>
+                            )}
+                          </div>
+                          {order.source !== 'REFURBISHED' && (
+                            <div className="hidden md:flex flex-col gap-2 w-48">
                               <Link to={`/return-flow`}>
-                                <button className="bg-white border border-border-subtle px-4 py-1.5 rounded-full text-label-bold font-label-bold shadow-sm hover:bg-surface-container-low active:scale-95 transition-all">
-                                  Return or replace
+                                <button className="w-full bg-white border border-border-subtle py-1.5 rounded-lg text-body-sm font-medium hover:bg-surface-container-low">
+                                  Return or replace items
                                 </button>
                               </Link>
                             </div>
-                          </div>
-                          <div className="hidden md:flex flex-col gap-2 w-48">
-                            <Link to={`/return-flow`}>
-                              <button className="w-full bg-white border border-border-subtle py-1.5 rounded-lg text-body-sm font-medium hover:bg-surface-container-low">
-                                Return or replace items
-                              </button>
-                            </Link>
-                          </div>
+                          )}
                         </div>
                       </div>
 

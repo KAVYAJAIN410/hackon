@@ -18,21 +18,30 @@ export default function ProductDetail() {
   const [buying, setBuying] = useState(false);
   const [purchaseResult, setPurchaseResult] = useState(null);
   const [addedToCart, setAddedToCart] = useState(false);
+  const [selectedGrade, setSelectedGrade] = useState(null);
 
   useEffect(() => {
     if (!id || !currentUser) return;
     setIsLoading(true);
-    api.get(`/marketplace/${id}?user_id=${currentUser.id}`)
-      .then(setItem)
+    api.get(`/marketplace/${id}`)
+      .then((data) => {
+        setItem(data);
+        setSelectedGrade(data.defaultGrade);
+      })
       .catch((err) => setError(err.message))
       .finally(() => setIsLoading(false));
   }, [id, currentUser?.id]);
 
+  // Get the currently selected grade entry
+  const currentGrade = item?.availableGrades?.find(g => g.grade === selectedGrade) || item?.availableGrades?.[0];
+  // First inventory item for the selected grade (full details incl. grading + shipping)
+  const currentItem = currentGrade?.items?.[0];
+
   const handleBuy = async () => {
-    if (!currentUser || buying) return;
+    if (!currentUser || buying || !currentItem) return;
     setBuying(true);
     try {
-      const result = await api.post(`/marketplace/${id}/buy`, { buyerId: currentUser.id });
+      const result = await api.post(`/marketplace/${currentItem.inventoryItemId}/buy`, {});
       setPurchaseResult(result);
     } catch (err) {
       alert('Purchase failed: ' + err.message);
@@ -42,15 +51,15 @@ export default function ProductDetail() {
   };
 
   const handleAddToCart = () => {
-    if (!item) return;
+    if (!item || !currentGrade || !currentItem) return;
     const product = item.product || {};
     addToCart({
-      id: item.id,
+      id: currentItem.inventoryItemId,
       title: product.name || 'Product',
-      price: parseFloat(item.sellingPrice) || 0,
-      grade: `Grade ${item.grade}`,
+      price: currentGrade.sellingPrice || 0,
+      grade: `Grade ${currentGrade.grade}`,
       image: product.imageUrl || '',
-      savesCO2: item.discountPct ? (item.discountPct * 0.1).toFixed(1) : '0.5',
+      savesCO2: currentGrade.discountPct ? (currentGrade.discountPct * 0.1).toFixed(1) : '0.5',
     });
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 2000);
@@ -107,34 +116,82 @@ export default function ProductDetail() {
     return (
       <div className="min-h-screen bg-[#f8f9fa] flex flex-col">
         <Header />
-        <main className="flex-grow flex items-center justify-center">
-          <div className="max-w-lg w-full bg-white border border-[#D5D9D9] rounded-lg p-8 shadow-md text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-[#067D62] text-white rounded-full mb-4">
-              <span className="material-symbols-outlined text-4xl">check</span>
+        <main className="flex-grow flex items-center justify-center px-4 py-10">
+          <div className="max-w-md w-full bg-white border border-[#D5D9D9] rounded-2xl shadow-lg overflow-hidden">
+            {/* Green header banner */}
+            <div className="bg-gradient-to-br from-[#067D62] to-[#2DC071] px-8 py-8 text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 backdrop-blur rounded-full mb-3">
+                <span className="material-symbols-outlined text-4xl text-white">check_circle</span>
+              </div>
+              <h2 className="text-2xl font-bold text-white">Order Confirmed!</h2>
+              <p className="text-white/90 text-sm mt-1">{purchaseResult.message}</p>
             </div>
-            <h2 className="text-2xl font-bold text-[#0F1111] mb-2">Purchase Successful!</h2>
-            <p className="text-[#565959] mb-4">{purchaseResult.message}</p>
-            <div className="bg-[#F0FDF4] border border-[#2DC071]/30 rounded-lg p-4 mb-6">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm text-[#565959]">Order ID</span>
-                <span className="font-bold text-[#0F1111]">{purchaseResult.order?.id}</span>
+
+            {/* Order details */}
+            <div className="p-6">
+              {/* Product line */}
+              <div className="flex items-center gap-3 pb-4 border-b border-[#EAEDED]">
+                {purchaseResult.productImage && (
+                  <img src={purchaseResult.productImage} alt={purchaseResult.productName}
+                    className="w-14 h-14 object-contain bg-[#F7F8F8] rounded-lg p-1" />
+                )}
+                <div className="flex-1">
+                  <p className="text-sm font-bold text-[#0F1111] line-clamp-1">{purchaseResult.productName}</p>
+                  <span className="inline-block mt-0.5 text-[10px] font-bold px-2 py-0.5 bg-[#F0FDF4] text-reloop-green rounded">
+                    Grade {purchaseResult.grade} · Certified Refurbished
+                  </span>
+                </div>
               </div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm text-[#565959]">Total Price</span>
-                <span className="font-bold text-[#0F1111]">₹{purchaseResult.order?.totalPrice?.toLocaleString()}</span>
+
+              {/* Order summary */}
+              <div className="py-4 space-y-2.5 border-b border-[#EAEDED]">
+                <div className="flex justify-between text-sm">
+                  <span className="text-[#565959]">Order Number</span>
+                  <span className="font-bold text-[#0F1111] font-mono">{purchaseResult.orderNumber}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-[#565959]">Item Price</span>
+                  <span className="text-[#0F1111]">₹{parseFloat(purchaseResult.sellingPrice || 0).toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-[#565959]">Shipping</span>
+                  <span className="text-[#0F1111]">
+                    {purchaseResult.shippingCost === 0 ? 'FREE' : `₹${parseFloat(purchaseResult.shippingCost || 0).toLocaleString()}`}
+                  </span>
+                </div>
+                <div className="flex justify-between text-base font-bold pt-1">
+                  <span className="text-[#0F1111]">Total Paid</span>
+                  <span className="text-[#0F1111]">₹{parseFloat(purchaseResult.totalPrice || 0).toLocaleString()}</span>
+                </div>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-[#565959]">Green Credits Earned</span>
-                <span className="font-bold text-[#2DC071]">+{purchaseResult.creditsAwarded}</span>
+
+              {/* Delivery + credits */}
+              <div className="py-4 space-y-2.5">
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="material-symbols-outlined text-[#007185] text-[18px]">local_shipping</span>
+                  <span className="text-[#565959]">
+                    Estimated delivery in <span className="font-bold text-[#0F1111]">{purchaseResult.estimatedDays || 3} day{(purchaseResult.estimatedDays || 3) > 1 ? 's' : ''}</span>
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-sm bg-[#F0FDF4] rounded-lg p-3">
+                  <span className="material-symbols-outlined text-reloop-green text-[18px]">eco</span>
+                  <span className="text-[#0F1111]">
+                    You earned <span className="font-bold text-reloop-green">+{purchaseResult.creditsAwarded} Green Credits</span> for choosing refurbished!
+                  </span>
+                </div>
               </div>
-            </div>
-            <div className="flex gap-3">
-              <button onClick={() => navigate('/marketplace')} className="flex-1 px-4 py-2 bg-white border border-[#D5D9D9] rounded-lg text-sm font-bold hover:bg-[#F7F8F8]">
-                Continue Shopping
-              </button>
-              <button onClick={() => navigate('/green-profile')} className="flex-1 px-4 py-2 bg-[#FFD814] border border-[#FCD200] rounded-lg text-sm font-bold hover:bg-[#F7CA00]">
-                View Green Profile
-              </button>
+
+              {/* Actions */}
+              <div className="flex gap-3 mt-2">
+                <button onClick={() => navigate('/marketplace')}
+                  className="flex-1 px-4 py-2.5 bg-white border border-[#D5D9D9] rounded-lg text-sm font-bold hover:bg-[#F7F8F8] transition-colors">
+                  Continue Shopping
+                </button>
+                <button onClick={() => navigate('/green-profile')}
+                  className="flex-1 px-4 py-2.5 bg-[#FFD814] border border-[#FCD200] rounded-lg text-sm font-bold hover:bg-[#F7CA00] transition-colors">
+                  View Green Profile
+                </button>
+              </div>
             </div>
           </div>
         </main>
@@ -143,12 +200,23 @@ export default function ProductDetail() {
     );
   }
 
-  const grading = item.grading || {};
-  const shipping = item.shipping || {};
+  const grading = currentItem?.grading || {};
+  const shipping = currentItem?.shipping || {};
   const product = item.product || {};
-  const discountPct = item.basePrice && item.sellingPrice
-    ? Math.round((1 - parseFloat(item.sellingPrice) / parseFloat(item.basePrice)) * 100)
+  const sellingPrice = currentGrade?.sellingPrice || 0;
+  const basePrice = item.mrp || 0;
+  const discountPct = basePrice && sellingPrice
+    ? Math.round((1 - sellingPrice / basePrice) * 100)
     : 0;
+
+  const GRADE_BADGE = {
+    'A+': 'bg-reloop-green text-white',
+    'A': 'bg-[#16a34a] text-white',
+    'B': 'bg-[#d97706] text-white',
+    'C': 'bg-[#c2410c] text-white',
+    'D': 'bg-[#b91c1c] text-white',
+    'F': 'bg-[#7f1d1d] text-white',
+  };
 
   return (
     <div className="min-h-screen bg-[#f8f9fa] flex flex-col">
@@ -175,7 +243,7 @@ export default function ProductDetail() {
                   )}
                   <div className="absolute top-4 left-4 bg-reloop-green text-white px-2 py-1 text-label-caps font-label-caps rounded flex items-center gap-1">
                     <span className="material-symbols-outlined text-[14px]">verified</span>
-                    AI-VERIFIED GRADE {item.grade}
+                    AI-VERIFIED GRADE {currentGrade?.grade}
                   </div>
                 </div>
               </div>
@@ -193,12 +261,42 @@ export default function ProductDetail() {
                   <hr className="border-border-subtle my-2"/>
                   <div className="flex items-baseline gap-2 py-2">
                     <span className="text-body-sm text-secondary self-start mt-1">₹</span>
-                    <span className="font-price-lg text-price-lg">{parseFloat(item.sellingPrice).toLocaleString()}</span>
-                    <span className="text-body-sm text-secondary line-through">₹{parseFloat(item.basePrice).toLocaleString()}</span>
+                    <span className="font-price-lg text-price-lg">{sellingPrice.toLocaleString()}</span>
+                    <span className="text-body-sm text-secondary line-through">₹{basePrice.toLocaleString()}</span>
                     {discountPct > 0 && (
                       <span className="text-reloop-green font-label-bold text-label-bold">{discountPct}% Savings</span>
                     )}
                   </div>
+
+                  {/* Grade Selector — like Cashify's Fair/Good/Superb */}
+                  <div className="mb-4">
+                    <p className="text-body-sm font-bold text-on-surface mb-2">Condition</p>
+                    <div className="flex flex-wrap gap-2">
+                      {item.availableGrades?.map((g) => {
+                        const isSelected = g.grade === selectedGrade;
+                        return (
+                          <button
+                            key={g.grade}
+                            onClick={() => setSelectedGrade(g.grade)}
+                            className={`px-4 py-2 rounded-lg border text-sm font-bold transition-all ${
+                              isSelected
+                                ? 'border-reloop-green bg-[#F0FDF4] text-reloop-green ring-1 ring-reloop-green'
+                                : 'border-[#D5D9D9] bg-white text-[#0F1111] hover:border-reloop-green'
+                            }`}
+                          >
+                            <div className="flex flex-col items-start">
+                              <span>Grade {g.grade} · {g.gradeLabel}</span>
+                              <span className="text-[11px] font-normal text-secondary">
+                                ₹{g.sellingPrice.toLocaleString()}
+                                {g.quantity > 1 && ` · ${g.quantity} available`}
+                              </span>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
                   <p className="text-body-sm text-secondary mb-4">
                     {shipping.totalShipping === 0 ? (
                       <span>Eligible for <span className="text-reloop-green font-bold">Free Eco-Shipping</span> to {currentUser?.city || 'you'}.</span>
@@ -231,7 +329,7 @@ export default function ProductDetail() {
                         }`}>{grading.score || '—'}</span>
                       </div>
                       <div>
-                        <p className="text-body-md font-bold">AI Confidence: {grading.confidence || '—'}%</p>
+                        <p className="text-body-md font-bold">AI Confidence: {grading.confidence ? Math.round(grading.confidence * 100) : '—'}%</p>
                         <p className="text-body-sm text-secondary">{grading.conditionSummary || 'No grading data available.'}</p>
                       </div>
                     </div>
@@ -283,14 +381,9 @@ export default function ProductDetail() {
                         <span className="text-secondary">Estimated Delivery</span>
                         <span className="font-bold">{shipping.estimatedDays || '—'} day{(shipping.estimatedDays || 0) > 1 ? 's' : ''}</span>
                       </div>
-                      {item.isNearYou && (
+                      {currentItem?.isNearYou && (
                         <div className="bg-[#F0FDF4] p-2 rounded text-[11px] text-center text-reloop-green font-bold">
                           📍 This item is near you — reduced carbon footprint!
-                        </div>
-                      )}
-                      {item.demandSignal > 0 && (
-                        <div className="bg-[#FFF8E1] p-2 rounded text-[11px] text-center text-[#F57C00] font-bold">
-                          🔥 {item.demandSignal} people are viewing this item
                         </div>
                       )}
                     </div>

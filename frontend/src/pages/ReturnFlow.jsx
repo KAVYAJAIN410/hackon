@@ -54,7 +54,7 @@ export default function ReturnFlow() {
   useEffect(() => {
     if (!currentUser) return;
     setLoadingOrders(true);
-    api.get(`/orders?user_id=${currentUser.id}`)
+    api.get('/orders')
       .then((data) => {
         const eligible = data.filter(o => o.status === 'DELIVERED' && !o.hasActiveReturn);
         setOrders(eligible);
@@ -81,20 +81,15 @@ export default function ReturnFlow() {
       setGradingFailed(false);
       setStep(4);
       try {
-        // 1. Create the return
+        // 1. Create the return (PENDING status)
         const returnResp = await api.post('/returns', {
           orderId: selectedOrder.id,
-          userId: currentUser.id,
           reason: REASON_MAP[selectedReason] || 'SIZE_FIT',
         });
         setReturnData(returnResp);
 
-        // Remove returned order from eligible list
-        setOrders(prev => prev.filter(o => o.id !== selectedOrder.id));
-
         // 2. Grade the return with images
         const formData = new FormData();
-        // API expects 'returnId' but response has 'id'
         const returnId = returnResp.returnId || returnResp.id;
         formData.append('returnId', returnId);
         if (uploadedFiles.length > 0) {
@@ -102,15 +97,19 @@ export default function ReturnFlow() {
         }
         const gradeResp = await api.postFormData('/grading', formData);
         setGradingResult(gradeResp);
+
+        // 3. Confirm the return (PENDING → INITIATED, order → RETURN_REQUESTED)
+        await api.post(`/returns/${returnId}/confirm`);
+
+        // Remove returned order from eligible list
+        setOrders(prev => prev.filter(o => o.id !== selectedOrder.id));
       } catch (err) {
         console.error('Return/grading failed:', err);
         setGradingFailed(true);
-        // Don't navigate away — show failure in step 4
       } finally {
         setProcessing(false);
       }
     } else if (step === 4) {
-      // Navigate to interception page only if grading succeeded
       if (gradingResult) {
         navigate('/return-interception', {
           state: {
@@ -127,7 +126,16 @@ export default function ReturnFlow() {
     if (step > 1 && step < 4) setStep(step - 1);
   };
 
-  const handleCancel = () => {
+  const handleCancel = async () => {
+    // If we have a return created, cancel it on the backend (cleans up grading, images, etc.)
+    if (returnData) {
+      const returnId = returnData.returnId || returnData.id;
+      try {
+        await api.post(`/returns/${returnId}/cancel`);
+      } catch (err) {
+        console.error('Cancel failed:', err);
+      }
+    }
     navigate('/my-returns');
   };
 
@@ -362,14 +370,10 @@ export default function ReturnFlow() {
                               <p className="text-xs text-[#565959] mt-2 italic">{gradingResult.grading?.conditionSummary}</p>
                             </div>
                           </div>
-                          {/* Credits & Routing Card */}
+                          {/* Routing Card */}
                           <div className="bg-[#F7F8F8] border border-[#D5D9D9] p-6 rounded-lg">
-                            <h3 className="text-base font-bold text-[#0F1111] mb-4 border-b border-[#D5D9D9] pb-2">Credits & Routing</h3>
+                            <h3 className="text-base font-bold text-[#0F1111] mb-4 border-b border-[#D5D9D9] pb-2">Routing Decision</h3>
                             <div className="space-y-3">
-                              <div className="flex justify-between items-center text-sm text-[#0F1111]">
-                                <span>Green Credits Earned</span>
-                                <span className="font-bold text-[#2DC071] text-lg">+{gradingResult.creditsAwarded}</span>
-                              </div>
                               <div className="flex justify-between items-center text-sm text-[#0F1111]">
                                 <span>Routing Decision</span>
                                 <span className="font-bold">{gradingResult.routing?.chosenRoute}</span>
@@ -428,7 +432,7 @@ export default function ReturnFlow() {
                   <div>
                     <p className="text-xs text-[#565959] uppercase font-bold tracking-wider">Green Credits</p>
                     <p className="text-lg font-bold text-[#0F1111]">
-                      {gradingResult ? `+${gradingResult.creditsAwarded} earned` : 'Earn credits by returning!'}
+                      Earn credits by buying refurbished or trading in!
                     </p>
                   </div>
                 </div>

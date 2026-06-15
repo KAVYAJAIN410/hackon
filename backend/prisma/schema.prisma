@@ -113,7 +113,8 @@ model Return {
   user            User               @relation(fields: [userId], references: [id])
   currentDc       DeliveryCenter?    @relation(fields: [currentDcId], references: [id])
   images          ReturnImage[]
-  grading         AiGrading?
+  gradings        AiGrading[]
+  finalGrading    FinalGrading?
   inventoryItem   InventoryItem?
 
   @@index([userId])
@@ -135,6 +136,27 @@ model ReturnImage {
 
 model AiGrading {
   id                   String   @id @default(uuid()) @map("id")
+  returnId             String   @map("return_id")
+  grade                String
+  score                Int
+  confidence           Decimal  @db.Decimal(5, 2)
+  conditionSummary     String?  @map("condition_summary") @db.Text
+  defectsFound         Json?    @map("defects_found")
+  missingParts         Json?    @map("missing_parts")
+  functionalNotes      String?  @map("functional_notes") @db.Text
+  estimatedResaleValue Decimal? @map("estimated_resale_value") @db.Decimal(10, 2)
+  gradeDiscountPct     Int      @map("grade_discount_pct")
+  routeDecision        String?  @map("route_decision")
+  gradedBy             String   @default("USER") @map("graded_by") // 'USER' or 'DELIVERY_ASSOCIATE'
+  createdAt            DateTime @default(now()) @map("created_at")
+
+  return Return @relation(fields: [returnId], references: [id])
+
+  @@map("ai_gradings")
+}
+
+model FinalGrading {
+  id                   String   @id @default(uuid()) @map("id")
   returnId             String   @unique @map("return_id")
   grade                String
   score                Int
@@ -150,7 +172,7 @@ model AiGrading {
 
   return Return @relation(fields: [returnId], references: [id])
 
-  @@map("ai_gradings")
+  @@map("final_gradings")
 }
 
 model InventoryItem {

@@ -11,7 +11,7 @@ router.get('/returns', async (req, res) => {
     const returns = await prisma.return.findMany({
       include: {
         order: { include: { product: true } },
-        grading: true,
+        gradings: true,
         currentDc: true,
         images: true,
       },

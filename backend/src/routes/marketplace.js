@@ -4,7 +4,7 @@ const { calculateDeliveryCost, calculateViability } = require('../lib/costing');
 const { GRADE_CONFIG, GREEN_CREDITS, COSTS } = require('../lib/constants');
 const { authenticate } = require('../middleware/auth');
 
-// GET /api/marketplace — fetch available inventory with per-buyer pricing
+// GET /api/marketplace — fetch available products grouped by product with grade options
 router.get('/', authenticate, async (req, res) => {
   try {
     const userId = req.user.id;
@@ -25,7 +25,7 @@ router.get('/', authenticate, async (req, res) => {
         product: true,
         currentDc: true,
         return: {
-          include: { grading: true },
+          include: { gradings: true, finalGrading: true },
         },
       },
     });
@@ -33,10 +33,12 @@ router.get('/', authenticate, async (req, res) => {
     // Fetch all DC routes for cost calculation
     const dcRoutes = await prisma.dcRoute.findMany();
 
-    // Calculate per-buyer pricing for each item
-    const pricedItems = items.map(item => {
+    // Group items by productId
+    const productMap = {};
+
+    items.forEach(item => {
       const delivery = calculateDeliveryCost(item.currentDcId, buyer.nearestDcId, dcRoutes);
-      const grading = item.return?.grading;
+      const grading = item.return?.finalGrading || item.return?.gradings?.[0] || null;
       const gradeDiscountPct = grading?.gradeDiscountPct || GRADE_CONFIG[item.grade]?.discountPct || 20;
 
       const viability = calculateViability(
@@ -45,51 +47,115 @@ router.get('/', authenticate, async (req, res) => {
         delivery.totalShipping
       );
 
-      const isNearYou = item.currentDcId === buyer.nearestDcId;
+      // Skip non-viable items
+      if (!viability.viable) return;
 
-      return {
-        id: item.id,
-        product: item.product,
-        grade: item.grade,
-        gradeLabel: GRADE_CONFIG[item.grade]?.label || item.grade,
-        source: item.source,
+      const isNearYou = item.currentDcId === buyer.nearestDcId;
+      const productId = item.productId;
+
+      if (!productMap[productId]) {
+        productMap[productId] = {
+          productId,
+          product: item.product,
+          mrp: parseFloat(item.product.mrp),
+          grades: {},
+        };
+      }
+
+      const grade = item.grade;
+      if (!productMap[productId].grades[grade]) {
+        productMap[productId].grades[grade] = {
+          grade,
+          gradeLabel: GRADE_CONFIG[grade]?.label || grade,
+          discountPct: gradeDiscountPct,
+          sellingPrice: viability.sellingPrice,
+          quantity: 0,
+          items: [],
+          // Use the closest/cheapest shipping for this grade
+          bestShipping: delivery,
+          isNearYou,
+        };
+      }
+
+      const gradeEntry = productMap[productId].grades[grade];
+      gradeEntry.quantity += 1;
+      gradeEntry.items.push({
+        inventoryItemId: item.id,
         currentDc: item.currentDc,
-        basePrice: parseFloat(item.basePrice),
-        sellingPrice: viability.sellingPrice,
-        mrp: parseFloat(item.product.mrp),
-        discountPct: gradeDiscountPct,
         shipping: delivery,
-        totalPrice: viability.sellingPrice + delivery.totalShipping,
         isNearYou,
-        viable: viability.viable,
-        greenCreditsOnPurchase: GREEN_CREDITS.PURCHASE_RELOOP,
+        totalPrice: viability.sellingPrice + delivery.totalShipping,
         grading: grading ? {
           grade: grading.grade,
           score: grading.score,
           confidence: parseFloat(grading.confidence),
           conditionSummary: grading.conditionSummary,
         } : null,
+      });
+
+      // Track the best (cheapest) option for this grade
+      if (delivery.totalShipping < gradeEntry.bestShipping.totalShipping) {
+        gradeEntry.bestShipping = delivery;
+        gradeEntry.isNearYou = isNearYou;
+      }
+    });
+
+    // Convert to array and format response
+    const result = Object.values(productMap).map(entry => {
+      const gradesArray = Object.values(entry.grades).sort((a, b) => {
+        const order = ['A+', 'A', 'B', 'C', 'D', 'F'];
+        return order.indexOf(a.grade) - order.indexOf(b.grade);
+      });
+
+      // Default to best available grade
+      const bestGrade = gradesArray[0];
+
+      return {
+        productId: entry.productId,
+        product: entry.product,
+        mrp: entry.mrp,
+        // Default display values (best grade)
+        defaultGrade: bestGrade.grade,
+        defaultGradeLabel: bestGrade.gradeLabel,
+        defaultSellingPrice: bestGrade.sellingPrice,
+        defaultTotalPrice: bestGrade.sellingPrice + bestGrade.bestShipping.totalShipping,
+        defaultShipping: bestGrade.bestShipping,
+        isNearYou: bestGrade.isNearYou,
+        discountPct: bestGrade.discountPct,
+        // All available grades for this product (like Cashify's Fair/Good/Superb)
+        availableGrades: gradesArray.map(g => ({
+          grade: g.grade,
+          gradeLabel: g.gradeLabel,
+          quantity: g.quantity,
+          sellingPrice: g.sellingPrice,
+          discountPct: g.discountPct,
+          totalPrice: g.sellingPrice + g.bestShipping.totalShipping,
+          shipping: g.bestShipping,
+          isNearYou: g.isNearYou,
+          // First inventory item ID for this grade (for buying)
+          inventoryItemId: g.items[0]?.inventoryItemId,
+        })),
+        totalQuantity: gradesArray.reduce((sum, g) => sum + g.quantity, 0),
+        greenCreditsOnPurchase: GREEN_CREDITS.PURCHASE_RELOOP,
       };
     });
 
-    // Filter out non-viable items
-    const viableItems = pricedItems.filter(item => item.viable);
-
-    // Sort: near items first, then by selling price
-    viableItems.sort((a, b) => {
+    // Sort: products with near-you items first, then by default price
+    result.sort((a, b) => {
       if (a.isNearYou && !b.isNearYou) return -1;
       if (!a.isNearYou && b.isNearYou) return 1;
-      return a.totalPrice - b.totalPrice;
+      return a.defaultTotalPrice - b.defaultTotalPrice;
     });
 
-    res.json(viableItems);
+    res.json(result);
   } catch (error) {
     console.error('Error fetching marketplace:', error);
     res.status(500).json({ error: 'Failed to fetch marketplace items' });
   }
 });
 
-// GET /api/marketplace/:id — single item detail with full pricing + health card
+// GET /api/marketplace/:id — product detail with all available grades
+// :id can be a productId (from grouped listing) or inventoryItemId (legacy)
 router.get('/:id', authenticate, async (req, res) => {
   try {
     const { id } = req.params;
@@ -103,67 +169,105 @@ router.get('/:id', authenticate, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const item = await prisma.inventoryItem.findUnique({
-      where: { id },
+    // Try as productId first, then as inventoryItemId
+    let productId = id;
+    const asInventory = await prisma.inventoryItem.findUnique({ where: { id } });
+    if (asInventory) {
+      productId = asInventory.productId;
+    }
+
+    // Get product info
+    const product = await prisma.product.findUnique({ where: { id: productId } });
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    // Get all available inventory items for this product
+    const items = await prisma.inventoryItem.findMany({
+      where: { productId, status: 'AVAILABLE' },
       include: {
-        product: true,
         currentDc: true,
         return: {
-          include: {
-            grading: true,
-            images: true,
-          },
+          include: { gradings: true, finalGrading: true, images: true },
         },
       },
     });
 
-    if (!item) {
-      return res.status(404).json({ error: 'Inventory item not found' });
+    if (items.length === 0) {
+      return res.status(404).json({ error: 'No available inventory for this product' });
     }
 
     const dcRoutes = await prisma.dcRoute.findMany();
-    const delivery = calculateDeliveryCost(item.currentDcId, buyer.nearestDcId, dcRoutes);
-    const grading = item.return?.grading;
-    const gradeDiscountPct = grading?.gradeDiscountPct || GRADE_CONFIG[item.grade]?.discountPct || 20;
 
-    const viability = calculateViability(
-      parseFloat(item.product.mrp),
-      gradeDiscountPct,
-      delivery.totalShipping
-    );
+    // Group by grade with full details
+    const gradeMap = {};
+    items.forEach(item => {
+      const delivery = calculateDeliveryCost(item.currentDcId, buyer.nearestDcId, dcRoutes);
+      const grading = item.return?.finalGrading || item.return?.gradings?.[0] || null;
+      const gradeDiscountPct = grading?.gradeDiscountPct || GRADE_CONFIG[item.grade]?.discountPct || 20;
+      const viability = calculateViability(parseFloat(product.mrp), gradeDiscountPct, delivery.totalShipping);
+      const isNearYou = item.currentDcId === buyer.nearestDcId;
 
-    const isNearYou = item.currentDcId === buyer.nearestDcId;
+      if (!gradeMap[item.grade]) {
+        gradeMap[item.grade] = {
+          grade: item.grade,
+          gradeLabel: GRADE_CONFIG[item.grade]?.label || item.grade,
+          discountPct: gradeDiscountPct,
+          sellingPrice: viability.sellingPrice,
+          quantity: 0,
+          items: [],
+        };
+      }
+
+      gradeMap[item.grade].quantity += 1;
+      gradeMap[item.grade].items.push({
+        inventoryItemId: item.id,
+        currentDc: item.currentDc,
+        shipping: delivery,
+        totalPrice: viability.sellingPrice + delivery.totalShipping,
+        isNearYou,
+        grading: grading ? {
+          id: grading.id,
+          grade: grading.grade,
+          score: grading.score,
+          confidence: parseFloat(grading.confidence),
+          conditionSummary: grading.conditionSummary,
+          defectsFound: grading.defectsFound,
+          missingParts: grading.missingParts,
+          functionalNotes: grading.functionalNotes,
+        } : null,
+        images: item.return?.images || [],
+      });
+    });
+
+    const availableGrades = Object.values(gradeMap).sort((a, b) => {
+      const order = ['A+', 'A', 'B', 'C', 'D', 'F'];
+      return order.indexOf(a.grade) - order.indexOf(b.grade);
+    });
+
+    const bestGrade = availableGrades[0];
+    const bestItem = bestGrade.items[0];
 
     res.json({
-      id: item.id,
-      product: item.product,
-      grade: item.grade,
-      gradeLabel: GRADE_CONFIG[item.grade]?.label || item.grade,
-      source: item.source,
-      currentDc: item.currentDc,
+      productId: product.id,
+      product,
+      mrp: parseFloat(product.mrp),
       buyerDc: buyer.nearestDc,
-      basePrice: parseFloat(item.basePrice),
-      sellingPrice: viability.sellingPrice,
-      mrp: parseFloat(item.product.mrp),
-      discountPct: gradeDiscountPct,
-      shipping: delivery,
-      totalPrice: viability.sellingPrice + delivery.totalShipping,
-      isNearYou,
-      viable: viability.viable,
-      profit: viability.profit,
+      availableGrades,
+      // Default selection (best grade, nearest item)
+      defaultGrade: bestGrade.grade,
+      defaultGradeLabel: bestGrade.gradeLabel,
+      defaultSellingPrice: bestGrade.sellingPrice,
+      defaultShipping: bestItem.shipping,
+      defaultTotalPrice: bestItem.totalPrice,
+      defaultInventoryItemId: bestItem.inventoryItemId,
+      isNearYou: bestItem.isNearYou,
+      discountPct: bestGrade.discountPct,
+      totalQuantity: availableGrades.reduce((s, g) => s + g.quantity, 0),
       greenCreditsOnPurchase: GREEN_CREDITS.PURCHASE_RELOOP,
-      grading: grading ? {
-        id: grading.id,
-        grade: grading.grade,
-        score: grading.score,
-        confidence: parseFloat(grading.confidence),
-        conditionSummary: grading.conditionSummary,
-        defectsFound: grading.defectsFound,
-        missingParts: grading.missingParts,
-        functionalNotes: grading.functionalNotes,
-        routeDecision: grading.routeDecision,
-      } : null,
-      images: item.return?.images || [],
+      // Health card from best item
+      grading: bestItem.grading,
+      images: bestItem.images,
     });
   } catch (error) {
     console.error('Error fetching marketplace item:', error);
@@ -266,7 +370,21 @@ router.post('/:id/buy', authenticate, async (req, res) => {
       return marketplaceOrder;
     });
 
-    res.status(201).json(result);
+    res.status(201).json({
+      orderId: result.id,
+      orderNumber: `RL-${result.id.slice(0, 8).toUpperCase()}`,
+      productName: item.product.name,
+      productImage: item.product.imageUrl,
+      grade: item.grade,
+      sellingPrice,
+      shippingCost,
+      totalPrice,
+      creditsAwarded: GREEN_CREDITS.PURCHASE_RELOOP,
+      estimatedDays: delivery.estimatedDays,
+      shipsFrom: item.currentDcId,
+      status: 'CONFIRMED',
+      message: `Your ${item.product.name} is confirmed and on its way!`,
+    });
   } catch (error) {
     console.error('Error processing purchase:', error);
     res.status(500).json({ error: 'Failed to process purchase' });
