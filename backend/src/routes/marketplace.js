@@ -209,6 +209,12 @@ router.get('/:id', authenticate, async (req, res) => {
       return res.status(404).json({ error: 'Product not found' });
     }
 
+    // Calculate high return risk
+    const totalOrders = await prisma.order.count({ where: { productId } });
+    const totalReturns = await prisma.return.count({ where: { order: { productId } } });
+    const returnRate = totalOrders > 0 ? (totalReturns / totalOrders) : 0;
+    const highReturnRisk = returnRate > 0.20;
+
     // Get all available inventory items for this product
     const items = await prisma.inventoryItem.findMany({
       where: { productId, status: 'AVAILABLE' },
@@ -325,6 +331,7 @@ router.get('/:id', authenticate, async (req, res) => {
             ? `${bestItem.ageMonths} month${bestItem.ageMonths !== 1 ? 's' : ''} old`
             : `${(bestItem.ageMonths / 12).toFixed(1)} years old`)
         : null,
+      highReturnRisk,
     });
   } catch (error) {
     console.error('Error fetching marketplace item:', error);
@@ -336,6 +343,7 @@ router.get('/:id', authenticate, async (req, res) => {
 router.post('/:id/buy', authenticate, async (req, res) => {
   try {
     const { id } = req.params;
+    const { pledgeMade } = req.body || {};
     const buyerId = req.user.id;
 
     // Verify buyer exists
@@ -396,13 +404,17 @@ router.post('/:id/buy', authenticate, async (req, res) => {
       }
 
       // Award green credits to buyer
+      const baseCredits = GREEN_CREDITS.PURCHASE_RELOOP;
+      const pledgeCredits = pledgeMade ? 50 : 0;
+      const totalCreditsAwarded = baseCredits + pledgeCredits;
+
       await tx.greenCreditLedger.create({
         data: {
           userId: buyerId,
-          amount: GREEN_CREDITS.PURCHASE_RELOOP,
-          action: 'PURCHASE_RELOOP',
+          amount: totalCreditsAwarded,
+          action: pledgeMade ? 'PURCHASE_RELOOP_WITH_PLEDGE' : 'PURCHASE_RELOOP',
           referenceId: marketplaceOrder.id,
-          description: `Purchased ${item.product.name} on ReLoop marketplace`,
+          description: `Purchased ${item.product.name} on ReLoop marketplace${pledgeMade ? ' (Green Pledge)' : ''}`,
         },
       });
 
@@ -410,7 +422,7 @@ router.post('/:id/buy', authenticate, async (req, res) => {
       const updatedBuyer = await tx.user.update({
         where: { id: buyerId },
         data: {
-          greenCredits: { increment: GREEN_CREDITS.PURCHASE_RELOOP },
+          greenCredits: { increment: totalCreditsAwarded },
         },
       });
 
@@ -436,7 +448,7 @@ router.post('/:id/buy', authenticate, async (req, res) => {
       sellingPrice,
       shippingCost,
       totalPrice,
-      creditsAwarded: GREEN_CREDITS.PURCHASE_RELOOP,
+      creditsAwarded: GREEN_CREDITS.PURCHASE_RELOOP + (pledgeMade ? 50 : 0),
       estimatedDays: delivery.estimatedDays,
       shipsFrom: item.currentDcId,
       status: 'CONFIRMED',

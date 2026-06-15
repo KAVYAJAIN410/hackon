@@ -18,6 +18,22 @@ router.post('/', authenticate, async (req, res) => {
       return res.status(400).json({ error: `Invalid reason. Must be one of: ${validReasons.join(', ')}` });
     }
 
+    // --- Green Pledge Strict Block ---
+    const hasPledge = await prisma.greenCreditLedger.findFirst({
+      where: {
+        userId,
+        referenceId: orderId,
+        action: 'PURCHASE_RELOOP_WITH_PLEDGE'
+      }
+    });
+
+    if (hasPledge) {
+      return res.status(403).json({ 
+        error: 'Return denied: You made a Green Pledge to keep this item and earned bonus Green Credits. Returns are disabled for this order to reduce carbon footprint.' 
+      });
+    }
+    // ---------------------------------
+
     const user = await prisma.user.findUnique({
       where: { id: userId },
       include: { nearestDc: true },
