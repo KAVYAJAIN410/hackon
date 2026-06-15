@@ -14,6 +14,7 @@ export default function Cart() {
   const [checkingOut, setCheckingOut] = useState(false);
   const [orderResult, setOrderResult] = useState(null);
   const [checkoutError, setCheckoutError] = useState(null);
+  const [pledgeMade, setPledgeMade] = useState(false);
 
   const handleCheckout = async () => {
     if (!currentUser) { setShowLoginModal(true); return; }
@@ -21,7 +22,7 @@ export default function Cart() {
     setCheckoutError(null);
     try {
       const results = await Promise.all(
-        cartItems.map(item => api.post(`/marketplace/${item.id}/buy`, { buyerId: currentUser.id }))
+        cartItems.map(item => api.post(`/marketplace/${item.id}/buy`, { buyerId: currentUser.id, pledgeMade }))
       );
       const totalCredits = results.reduce((s, r) => s + (r.creditsAwarded || 0), 0);
       clearCart();
@@ -224,6 +225,22 @@ export default function Cart() {
                 <div className="flex justify-between font-bold text-lg mb-5">
                   <span>Order Total</span>
                   <span>₹{totalPrice.toLocaleString()}</span>
+                </div>
+
+                {/* Green Checkout Pledge */}
+                <div className="bg-[#F0FDF4] border border-[#2DC071]/30 rounded-lg p-3 mb-4">
+                  <label className="flex gap-2 items-start cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      checked={pledgeMade}
+                      onChange={(e) => setPledgeMade(e.target.checked)}
+                      className="mt-1 w-4 h-4 text-[#2DC071] border-gray-300 rounded focus:ring-[#2DC071]" 
+                    />
+                    <span className="text-xs text-[#0F1111]">
+                      <b>🌱 The Green Pledge:</b> I have double-checked specifications. 
+                      <span className="text-[#2DC071] font-bold block mt-0.5">Earn +50 Green Credits per item!</span>
+                    </span>
+                  </label>
                 </div>
 
                 <button

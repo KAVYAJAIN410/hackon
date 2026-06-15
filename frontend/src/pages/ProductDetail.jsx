@@ -19,6 +19,9 @@ export default function ProductDetail() {
   const [purchaseResult, setPurchaseResult] = useState(null);
   const [addedToCart, setAddedToCart] = useState(false);
   const [selectedGrade, setSelectedGrade] = useState(null);
+  const [pledgeMade, setPledgeMade] = useState(false);
+  const [showSizeWarning, setShowSizeWarning] = useState(false);
+  const [pendingAction, setPendingAction] = useState(null);
 
   useEffect(() => {
     if (!id || !currentUser) return;
@@ -41,7 +44,7 @@ export default function ProductDetail() {
     if (!currentUser || buying || !currentItem) return;
     setBuying(true);
     try {
-      const result = await api.post(`/marketplace/${currentItem.inventoryItemId}/buy`, {});
+      const result = await api.post(`/marketplace/${currentItem.inventoryItemId}/buy`, { pledgeMade });
       setPurchaseResult(result);
     } catch (err) {
       alert('Purchase failed: ' + err.message);
@@ -63,6 +66,25 @@ export default function ProductDetail() {
     });
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 2000);
+  };
+
+  const isApparel = item?.product?.category?.toLowerCase().includes('fashion') 
+                 || item?.product?.category?.toLowerCase().includes('apparel') 
+                 || item?.product?.category?.toLowerCase().includes('clothing');
+
+  const onAddOrBuyClick = (action) => {
+    if (isApparel) {
+      setPendingAction(action);
+      setShowSizeWarning(true);
+    } else {
+      action === 'buy' ? handleBuy() : handleAddToCart();
+    }
+  };
+
+  const confirmAction = () => {
+    setShowSizeWarning(false);
+    if (pendingAction === 'buy') handleBuy();
+    else handleAddToCart();
   };
 
   if (isLoading) {
@@ -391,7 +413,19 @@ export default function ProductDetail() {
                 </div>
 
                 {/* Buy Section */}
-                <div className="bg-white border border-border-subtle rounded-xl p-6 shadow-sm mt-2">
+                <div className="bg-white border border-border-subtle rounded-xl p-6 shadow-sm mt-2 relative">
+                  
+                  {/* High Return Risk Banner */}
+                  {item.highReturnRisk && (
+                    <div className="bg-[#FFF8E1] border border-[#FFE082] p-3 rounded-lg mb-4 flex gap-3 items-start">
+                      <span className="material-symbols-outlined text-[#F57F17] text-[20px]">warning</span>
+                      <div className="text-sm text-[#0F1111]">
+                        <p className="font-bold mb-0.5">Frequent Return Alert</p>
+                        <p className="text-[#565959]">Other users frequently return this item (usually for Sizing). Please review the details carefully to help us reduce carbon emissions.</p>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="flex flex-col gap-4">
                     <div className="flex items-center justify-between">
                       <div>
@@ -399,9 +433,9 @@ export default function ProductDetail() {
                         <p className="text-body-sm text-secondary">Ships from ReLoop {currentUser?.nearestDc?.city || ''} Center.</p>
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
                       <button
-                        onClick={handleAddToCart}
+                        onClick={() => onAddOrBuyClick('cart')}
                         className={`w-full font-label-bold py-3 rounded shadow-sm transition-all active:scale-95 ${
                           addedToCart
                             ? 'bg-[#2DC071] text-white'
@@ -411,13 +445,30 @@ export default function ProductDetail() {
                         {addedToCart ? '✓ Added to Cart!' : 'Add to Cart'}
                       </button>
                       <button
-                        onClick={handleBuy}
+                        onClick={() => onAddOrBuyClick('buy')}
                         disabled={buying}
                         className="w-full bg-[#FFA41C] hover:opacity-90 active:scale-95 transition-all text-[#0F1111] font-label-bold py-3 rounded shadow-sm disabled:opacity-50"
                       >
                         {buying ? 'Processing...' : 'Buy Now'}
                       </button>
                     </div>
+
+                    {/* Green Checkout Pledge */}
+                    <div className="bg-[#F0FDF4] border border-[#2DC071]/30 rounded-lg p-3 mt-1">
+                      <label className="flex gap-2 items-start cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          checked={pledgeMade}
+                          onChange={(e) => setPledgeMade(e.target.checked)}
+                          className="mt-1 w-4 h-4 text-[#2DC071] border-gray-300 rounded focus:ring-[#2DC071]" 
+                        />
+                        <span className="text-sm text-[#0F1111]">
+                          <b>🌱 The Green Pledge:</b> I have double-checked the specifications and sizing. 
+                          <span className="text-[#2DC071] font-bold block mt-0.5">Earn +50 Green Credits on purchase!</span>
+                        </span>
+                      </label>
+                    </div>
+
                     <div className="flex items-center gap-4 text-body-sm text-secondary">
                       <div className="flex items-center gap-1">
                         <span className="material-symbols-outlined text-[18px]">lock</span>
@@ -436,6 +487,36 @@ export default function ProductDetail() {
           </div>
         </div>
       </main>
+
+      {/* Measure-Match Interstitial Modal */}
+      {showSizeWarning && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl relative animate-fade-in-up">
+            <div className="w-16 h-16 bg-[#FFF8E1] text-[#F57F17] rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="material-symbols-outlined text-3xl">straighten</span>
+            </div>
+            <h3 className="text-xl font-bold text-center text-[#0F1111] mb-2">Wait! Check your size</h3>
+            <p className="text-center text-[#565959] text-sm mb-6">
+              Apparel returns generate a massive carbon footprint. Are you absolutely sure this size will fit you perfectly?
+            </p>
+            <div className="space-y-3">
+              <button 
+                onClick={() => setShowSizeWarning(false)}
+                className="w-full py-3 bg-white border border-[#D5D9D9] text-[#0F1111] font-bold rounded-lg hover:bg-[#F7F8F8] transition-colors"
+              >
+                Go Back & Review Size
+              </button>
+              <button 
+                onClick={confirmAction}
+                className="w-full py-3 bg-[#FFD814] border border-[#FCD200] text-[#0F1111] font-bold rounded-lg hover:bg-[#F7CA00] transition-colors"
+              >
+                Yes, I'm Sure
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </div>
   );
