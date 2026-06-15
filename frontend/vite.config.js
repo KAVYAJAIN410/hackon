@@ -13,4 +13,10 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    // Disable CSS minification to avoid the lightningcss native-binary
+    // resolution issue on Vercel/Linux builds (the macOS-generated
+    // package-lock omits the Linux binary). CSS is served unminified.
+    cssMinify: false,
+  },
 })
