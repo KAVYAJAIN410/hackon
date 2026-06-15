@@ -3,7 +3,7 @@ const { prisma } = require('../lib/db');
 const { authenticate } = require('../middleware/auth');
 
 // POST /api/returns — create a PENDING return (not finalized yet)
-// User uploads images and gets grading before confirming
+// Supports both original orders and refurbished (marketplace) purchases.
 router.post('/', authenticate, async (req, res) => {
   try {
     const userId = req.user.id;
@@ -18,55 +18,90 @@ router.post('/', authenticate, async (req, res) => {
       return res.status(400).json({ error: `Invalid reason. Must be one of: ${validReasons.join(', ')}` });
     }
 
-    // --- Green Pledge Strict Block ---
-    const hasPledge = await prisma.greenCreditLedger.findFirst({
-      where: {
-        userId,
-        referenceId: orderId,
-        action: 'PURCHASE_RELOOP_WITH_PLEDGE'
-      }
-    });
-
-    if (hasPledge) {
-      return res.status(403).json({ 
-        error: 'Return denied: You made a Green Pledge to keep this item and earned bonus Green Credits. Returns are disabled for this order to reduce carbon footprint.' 
-      });
-    }
-    // ---------------------------------
-
     const user = await prisma.user.findUnique({
       where: { id: userId },
       include: { nearestDc: true },
     });
     if (!user) return res.status(404).json({ error: 'User not found' });
 
+    // Determine if this is an original order or a refurbished (marketplace) order
     const order = await prisma.order.findUnique({
       where: { id: orderId },
       include: { product: true },
     });
-    if (!order) return res.status(404).json({ error: 'Order not found' });
-    if (order.userId !== userId) return res.status(403).json({ error: 'Order does not belong to this user' });
 
-    // Check no existing non-cancelled return
+    let marketplaceOrder = null;
+    if (!order) {
+      marketplaceOrder = await prisma.marketplaceOrder.findUnique({
+        where: { id: orderId },
+        include: { inventoryItem: { include: { product: true } } },
+      });
+    }
+
+    if (!order && !marketplaceOrder) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    // Ownership check
+    if (order && order.userId !== userId) {
+      return res.status(403).json({ error: 'Order does not belong to this user' });
+    }
+    if (marketplaceOrder && marketplaceOrder.buyerId !== userId) {
+      return res.status(403).json({ error: 'Order does not belong to this user' });
+    }
+
+    // --- Green Pledge Strict Block (refurbished purchases with a pledge cannot be returned) ---
+    const hasPledge = await prisma.greenCreditLedger.findFirst({
+      where: {
+        userId,
+        referenceId: orderId,
+        action: 'PURCHASE_RELOOP_WITH_PLEDGE',
+      },
+    });
+    if (hasPledge) {
+      return res.status(403).json({
+        error: 'Return denied: You made a Green Pledge to keep this item and earned bonus Green Credits. Returns are disabled for this order to reduce carbon footprint.',
+      });
+    }
+
+    // Check no existing non-cancelled return for this order
     const existingReturn = await prisma.return.findFirst({
-      where: { orderId, status: { not: 'CANCELLED' } },
+      where: {
+        status: { not: 'CANCELLED' },
+        OR: [{ orderId }, { marketplaceOrderId: orderId }],
+      },
     });
     if (existingReturn) {
       return res.status(400).json({ error: 'A return already exists for this order', returnId: existingReturn.id });
     }
 
-    // Create return with PENDING status — not yet finalized
+    // Resolve product + refund amount based on order type
+    const product = order ? order.product : marketplaceOrder.inventoryItem?.product;
+    const refundAmount = order ? order.product.mrp : marketplaceOrder.totalPrice;
+
+    // --- 30-day return window enforcement ---
+    const refDate = order ? order.orderedAt : marketplaceOrder.createdAt;
+    const daysSince = (Date.now() - new Date(refDate).getTime()) / (1000 * 60 * 60 * 24);
+    if (daysSince > 30) {
+      return res.status(400).json({
+        error: 'Return window closed: items can only be returned within 30 days of delivery.',
+      });
+    }
+
+    // Create return with PENDING status — link to the correct order type
     const returnRecord = await prisma.return.create({
       data: {
-        orderId,
+        orderId: order ? orderId : null,
+        marketplaceOrderId: marketplaceOrder ? orderId : null,
         userId,
         reason,
         status: 'PENDING',
-        refundAmount: order.product.mrp,
+        refundAmount,
         currentDcId: user.nearestDcId,
       },
       include: {
         order: { include: { product: true } },
+        marketplaceOrder: { include: { inventoryItem: { include: { product: true } } } },
         user: { include: { nearestDc: true } },
       },
     });
@@ -131,11 +166,18 @@ router.post('/:id/confirm', authenticate, async (req, res) => {
       },
     });
 
-    // Update order status
-    await prisma.order.update({
-      where: { id: returnRecord.orderId },
-      data: { status: 'RETURN_REQUESTED' },
-    });
+    // Update order status — handle both original and marketplace orders
+    if (returnRecord.orderId) {
+      await prisma.order.update({
+        where: { id: returnRecord.orderId },
+        data: { status: 'RETURN_REQUESTED' },
+      });
+    } else if (returnRecord.marketplaceOrderId) {
+      await prisma.marketplaceOrder.update({
+        where: { id: returnRecord.marketplaceOrderId },
+        data: { status: 'RETURN_REQUESTED' },
+      });
+    }
 
     res.json({
       returnId: updated.id,

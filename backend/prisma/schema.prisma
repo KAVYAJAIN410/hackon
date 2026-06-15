@@ -96,7 +96,7 @@ model Order {
 
 model Return {
   id                String   @id @default(uuid()) @map("id")
-  orderId           String   @map("order_id")
+  orderId           String?  @map("order_id")
   userId            String   @map("user_id")
   reason            String
   status            String   @default("INITIATED")
@@ -107,9 +107,11 @@ model Return {
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
   pickupAssociateId String?  @map("pickup_associate_id")
+  marketplaceOrderId String? @unique @map("marketplace_order_id")
 
   pickupAssociate DeliveryAssociate? @relation(fields: [pickupAssociateId], references: [id])
-  order           Order              @relation(fields: [orderId], references: [id])
+  order           Order?             @relation(fields: [orderId], references: [id])
+  marketplaceOrder MarketplaceOrder? @relation(fields: [marketplaceOrderId], references: [id])
   user            User               @relation(fields: [userId], references: [id])
   currentDc       DeliveryCenter?    @relation(fields: [currentDcId], references: [id])
   images          ReturnImage[]
@@ -218,6 +220,7 @@ model MarketplaceOrder {
 
   inventoryItem InventoryItem @relation(fields: [inventoryItemId], references: [id])
   buyer         User          @relation(fields: [buyerId], references: [id])
+  return        Return?
 
   @@map("marketplace_orders")
 }

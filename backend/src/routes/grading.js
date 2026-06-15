@@ -33,11 +33,12 @@ router.post('/', authenticate, upload.array('images', 5), async (req, res) => {
       return res.status(400).json({ error: 'At least 2 images are required' });
     }
 
-    // Fetch return with order + product details
+    // Fetch return with order + product details (supports both original & marketplace orders)
     const returnRecord = await prisma.return.findUnique({
       where: { id: returnId },
       include: {
         order: { include: { product: true } },
+        marketplaceOrder: { include: { inventoryItem: { include: { product: true } } } },
         user: { include: { nearestDc: true } },
       },
     });
@@ -57,7 +58,11 @@ router.post('/', authenticate, upload.array('images', 5), async (req, res) => {
       await prisma.aiGrading.delete({ where: { id: existingGrading.id } });
     }
 
-    const product = returnRecord.order.product;
+    // Resolve product from either original order or refurbished (marketplace) order
+    const product = returnRecord.order?.product || returnRecord.marketplaceOrder?.inventoryItem?.product;
+    if (!product) {
+      return res.status(400).json({ error: 'Could not resolve product for this return' });
+    }
 
     // Step 1: Convert images to base64 for Gemini
     const images = req.files.map(file => ({
