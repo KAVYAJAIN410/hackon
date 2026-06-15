@@ -22,6 +22,8 @@ const upload = multer({
 // POST /api/grading — AI grade product + auto-decide route
 // This is the expanded endpoint: grades → decides route → awards credits
 router.post('/', authenticate, upload.array('images', 5), async (req, res) => {
+  // Track S3 uploads so we can clean up orphans if the DB commit fails (saga/compensating action)
+  let uploadedS3Urls = [];
   try {
     const { returnId } = req.body;
 
@@ -105,6 +107,8 @@ router.post('/', authenticate, upload.array('images', 5), async (req, res) => {
           uploadToS3(file.buffer, file.mimetype, `returns/${returnId}`)
         )
       );
+      // Record real (http) URLs so we can delete them if the DB commit fails later
+      uploadedS3Urls = imageUrls.filter(u => u.startsWith('http'));
     } catch (s3Error) {
       console.error('S3 upload error (non-fatal):', s3Error);
       // Continue without S3 — images won't have URLs but grading still works
@@ -330,6 +334,13 @@ router.post('/', authenticate, upload.array('images', 5), async (req, res) => {
     });
   } catch (error) {
     console.error('Error in grading:', error);
+    // Compensating action: delete any S3 objects uploaded before the failure
+    // to prevent orphaned blobs from accumulating in the bucket.
+    if (uploadedS3Urls.length > 0) {
+      const { deleteFromS3 } = require('../lib/s3');
+      await deleteFromS3(uploadedS3Urls);
+      console.log(`🧹 Cleaned up ${uploadedS3Urls.length} orphaned S3 object(s) after failed grading commit`);
+    }
     res.status(500).json({ error: 'Failed to grade product' });
   }
 });

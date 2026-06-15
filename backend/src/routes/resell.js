@@ -72,6 +72,8 @@ router.get('/:orderId/questions', authenticate, async (req, res) => {
 
 // POST /api/resell/:orderId/list — answers + images → AI grade → list on marketplace
 router.post('/:orderId/list', authenticate, upload.array('images', 5), async (req, res) => {
+  // Track S3 uploads for compensating cleanup if the DB commit fails
+  let uploadedS3Urls = [];
   try {
     const userId = req.user.id;
     const { orderId } = req.params;
@@ -150,6 +152,7 @@ router.post('/:orderId/list', authenticate, upload.array('images', 5), async (re
       healthImages = await Promise.all(
         (req.files || []).map(f => uploadToS3(f.buffer, f.mimetype, `outgrown/${orderId}`))
       );
+      uploadedS3Urls = healthImages.filter(u => typeof u === 'string' && u.startsWith('http'));
     } catch (s3Err) {
       console.error('S3 upload failed (non-fatal):', s3Err.message);
       healthImages = [];
@@ -224,6 +227,12 @@ router.post('/:orderId/list', authenticate, upload.array('images', 5), async (re
     });
   } catch (error) {
     console.error('Error listing resell product:', error);
+    // Compensating action: remove orphaned S3 objects if the DB commit failed
+    if (uploadedS3Urls.length > 0) {
+      const { deleteFromS3 } = require('../lib/s3');
+      await deleteFromS3(uploadedS3Urls);
+      console.log(`🧹 Cleaned up ${uploadedS3Urls.length} orphaned S3 object(s) after failed resell listing`);
+    }
     res.status(500).json({ error: 'Failed to list product' });
   }
 });
