@@ -1,0 +1,47 @@
+name: Deploy Backend to EC2
+
+# Trigger on pushes to master that touch the backend (plus manual runs)
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-backend.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to EC2 (zero-downtime)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script_stop: true
+          command_timeout: 15m
+          script: |
+            set -e
+            echo "📥 Pulling latest code..."
+            cd ~/hackon
+            git fetch origin master
+            git reset --hard origin/master
+
+            echo "📦 Installing backend dependencies..."
+            cd ~/hackon/backend
+            npm install
+
+            echo "🔧 Generating Prisma client..."
+            npx prisma generate
+
+            echo "🗄️  Syncing database schema (non-destructive)..."
+            npx prisma db push || echo "⚠️ prisma db push skipped/failed (no schema change or needs manual review)"
+
+            echo "🔄 Zero-downtime reload via PM2..."
+            pm2 reload reloop-api --update-env || pm2 start ecosystem.config.js
+            pm2 save
+
+            echo "✅ Deploy complete"
+            pm2 status
