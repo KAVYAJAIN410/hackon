@@ -5,15 +5,15 @@ import Footer from '../components/layout/Footer';
 import { SkeletonBox } from '../components/ui/SkeletonCard';
 import EmptyState from '../components/ui/EmptyState';
 import { useUser } from '../context/UserContext';
+import ResellModal from '../components/ResellModal';
 import api from '../lib/api';
 
 export default function OutgrownIt() {
   const [isLoading, setIsLoading] = useState(true);
   const [orders, setOrders] = useState([]);
   const [error, setError] = useState(null);
-  const [listingOrder, setListingOrder] = useState(null);
+  const [resellOrder, setResellOrder] = useState(null);
   const [listingResult, setListingResult] = useState(null);
-  const [listingError, setListingError] = useState(null);
   const { currentUser } = useUser();
 
   useEffect(() => {
@@ -25,19 +25,9 @@ export default function OutgrownIt() {
       .finally(() => setIsLoading(false));
   }, [currentUser?.id]);
 
-  const handleListOutgrown = async (order) => {
-    if (!currentUser) return;
-    setListingOrder(order.id);
-    setListingError(null);
-    try {
-      const result = await api.post('/outgrown', { orderId: order.id });
-      setListingResult(result);
-      setOrders(prev => prev.map(o => o.id === order.id ? { ...o, hasActiveOutgrown: true } : o));
-    } catch (err) {
-      setListingError(err.message || 'Failed to list item');
-    } finally {
-      setListingOrder(null);
-    }
+  const handleListed = (orderId, result) => {
+    setListingResult(result);
+    setOrders(prev => prev.map(o => o.id === orderId ? { ...o, hasActiveOutgrown: true } : o));
   };
 
   if (!currentUser) {
@@ -126,22 +116,19 @@ export default function OutgrownIt() {
             </div>
 
             {/* Listing Success Banner */}
-            {listingError && (
-              <div className="mb-4 bg-red-50 border border-red-200 rounded p-3 text-sm text-red-700 flex justify-between items-center">
-                <span>Failed to list item: {listingError}</span>
-                <button onClick={() => setListingError(null)} className="text-red-500 hover:text-red-700 ml-4">✕</button>
-              </div>
-            )}
-            {listingResult && (
+            {listingResult && listingResult.listed && (
               <div className="mb-6 bg-[#F0FDF4] border border-[#2DC071]/30 rounded-lg p-4">
                 <div className="flex items-start gap-3">
                   <span className="material-symbols-outlined text-[#2DC071] text-[28px]">check_circle</span>
                   <div>
                     <h3 className="font-bold text-[#0F1111] mb-1">{listingResult.message}</h3>
-                    <div className="flex gap-4 text-sm text-[#565959]">
-                      <span>Selling Price: <strong className="text-[#0F1111]">₹{listingResult.inventoryItem?.sellingPrice?.toLocaleString()}</strong></span>
+                    <div className="flex gap-4 text-sm text-[#565959] flex-wrap">
+                      <span>Grade: <strong className="text-[#0F1111]">{listingResult.grade}</strong></span>
+                      <span>Listed Price: <strong className="text-[#0F1111]">₹{listingResult.sellingPrice?.toLocaleString()}</strong></span>
                       <span>Green Credits: <strong className="text-[#2DC071]">+{listingResult.creditsAwarded}</strong></span>
-                      <span>Demand: <strong className="text-[#FF9900]">{listingResult.demandSignal} interested buyers</strong></span>
+                      {listingResult.demandSignal > 0 && (
+                        <span>Demand: <strong className="text-[#FF9900]">{listingResult.demandSignal} interested buyers</strong></span>
+                      )}
                     </div>
                   </div>
                   <button onClick={() => setListingResult(null)} className="ml-auto text-[#565959] hover:text-[#0F1111]">
@@ -158,7 +145,6 @@ export default function OutgrownIt() {
                 });
                 const product = order.product || {};
                 const isEligible = order.outgrownEligible && !order.hasActiveOutgrown && !order.hasActiveReturn;
-                const isListing = listingOrder === order.id;
 
                 return (
                   <div key={order.id} className={`border border-border-subtle rounded-lg bg-white overflow-hidden shadow-sm ${!isEligible && order.source !== 'REFURBISHED' ? 'opacity-60' : ''}`}>
@@ -260,12 +246,11 @@ export default function OutgrownIt() {
                           </div>
                           <div className="flex flex-col items-end gap-2">
                             <button
-                              onClick={() => handleListOutgrown(order)}
-                              disabled={isListing}
+                              onClick={() => setResellOrder(order)}
                               className="bg-[#FF9900] text-amazon-dark px-8 py-2.5 rounded-lg text-label-bold font-label-bold shadow-md hover:brightness-105 active:scale-95 transition-all flex items-center gap-2 disabled:opacity-50"
                             >
                               <span className="material-symbols-outlined text-[18px]">bolt</span>
-                              {isListing ? 'Listing...' : 'List in 1 Click'}
+                              Assess & List
                             </button>
                             <span className="text-body-sm font-body-sm text-secondary italic">We'll handle the pickup.</span>
                           </div>
@@ -286,6 +271,14 @@ export default function OutgrownIt() {
         </div>
       </main>
       <Footer />
+
+      {resellOrder && (
+        <ResellModal
+          order={resellOrder}
+          onClose={() => setResellOrder(null)}
+          onListed={handleListed}
+        />
+      )}
     </div>
   );
 }

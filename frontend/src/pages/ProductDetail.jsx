@@ -246,6 +246,24 @@ export default function ProductDetail() {
                     AI-VERIFIED GRADE {currentGrade?.grade}
                   </div>
                 </div>
+
+                {/* Actual condition photos (for inspected/refurbished items) */}
+                {currentItem?.images?.length > 0 && (
+                  <div className="bg-white border border-border-subtle rounded p-4">
+                    <p className="text-xs font-bold text-[#565959] uppercase tracking-wider mb-2 flex items-center gap-1">
+                      <span className="material-symbols-outlined text-[16px] text-reloop-green">photo_camera</span>
+                      Actual Product Photos (AI-Verified Condition)
+                    </p>
+                    <div className="grid grid-cols-4 gap-2">
+                      {currentItem.images.map((img, i) => (
+                        <div key={i} className="aspect-square rounded overflow-hidden border border-[#D5D9D9] bg-[#F7F8F8]">
+                          <img src={img.imageUrl} alt={`condition-${i}`} className="w-full h-full object-cover" />
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-[10px] text-[#565959] mt-2 italic">These are real photos of this exact item, verified by AI grading.</p>
+                  </div>
+                )}
               </div>
 
               {/* Right: Details */}
@@ -255,6 +273,21 @@ export default function ProductDetail() {
                   <h1 className="font-display-lg text-display-lg text-on-surface mb-1">
                     ReLoop Certified: {product.name}
                   </h1>
+                  {currentItem?.source === 'OUTGROWN' && (
+                    <div className="flex items-center gap-2 bg-[#F3E8FF] border border-[#7C3AED]/30 rounded-lg px-3 py-2 mb-2">
+                      <span className="material-symbols-outlined text-[#7C3AED] text-[20px]">recycling</span>
+                      <div>
+                        <p className="text-sm font-bold text-[#7C3AED]">Pre-Loved · Resold by Original Owner</p>
+                        <p className="text-[11px] text-[#565959]">This item was previously owned and traded in through ReLoop, then AI-verified for resale.</p>
+                      </div>
+                    </div>
+                  )}
+                  {item.ageLabel && (
+                    <span className="inline-flex items-center gap-1 text-xs font-bold text-[#C45500] bg-[#FFF4E5] px-2 py-1 rounded mb-2">
+                      <span className="material-symbols-outlined text-[14px]">schedule</span>
+                      {item.ageLabel}
+                    </span>
+                  )}
                   {product.description && (
                     <p className="text-body-sm text-secondary mb-2">{product.description}</p>
                   )}

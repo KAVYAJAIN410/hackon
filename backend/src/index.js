@@ -36,6 +36,7 @@ app.use('/api/seller/batch-grade', require('./routes/batchGrade'));
 app.use('/api/green-credits', require('./routes/greenCredits'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/outgrown', require('./routes/outgrown'));
+app.use('/api/resell', require('./routes/resell'));
 
 // 404 handler
 app.use((req, res) => {

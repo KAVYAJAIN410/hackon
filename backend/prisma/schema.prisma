@@ -187,6 +187,14 @@ model InventoryItem {
   source       String   @default("RETURN")
   createdAt    DateTime @default(now()) @map("created_at")
 
+  // ─── Outgrown / resell-specific fields (when source = 'OUTGROWN') ───
+  listedByUserId   String?  @map("listed_by_user_id")
+  sourceOrderId    String?  @map("source_order_id")
+  ageMonths        Int?     @map("age_months")
+  conditionAnswers Json?    @map("condition_answers")
+  gradingData      Json?    @map("grading_data")     // { grade, score, confidence, conditionSummary, defectsFound, missingParts }
+  healthImages     String[] @map("health_images")
+
   return           Return?           @relation(fields: [returnId], references: [id])
   product          Product           @relation(fields: [productId], references: [id])
   currentDc        DeliveryCenter    @relation(fields: [currentDcId], references: [id])

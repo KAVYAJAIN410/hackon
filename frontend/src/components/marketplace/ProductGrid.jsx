@@ -88,6 +88,8 @@ export default function ProductGrid({ filters }) {
             estimatedDays={item.defaultShipping?.estimatedDays}
             availableGrades={item.availableGrades}
             totalQuantity={item.totalQuantity}
+            isResold={item.isResold}
+            ageLabel={item.ageLabel}
           />
         ))}
       </div>

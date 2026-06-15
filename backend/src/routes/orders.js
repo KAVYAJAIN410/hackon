@@ -22,14 +22,27 @@ router.get('/', authenticate, async (req, res) => {
       orderBy: { orderedAt: 'desc' },
     });
 
-    const originalOrders = orders.map(order => ({
-      id: order.id,
-      product: order.product,
-      status: order.status,
-      orderedAt: order.orderedAt,
-      source: 'ORIGINAL',
-      outgrownEligible: order.status === 'DELIVERED' && order.returns.length === 0,
-    }));
+    // Find which orders have already been listed via resell (Outgrown)
+    const outgrownItems = await prisma.inventoryItem.findMany({
+      where: { source: 'OUTGROWN', listedByUserId: userId },
+      select: { sourceOrderId: true },
+    });
+    const listedOrderIds = new Set(outgrownItems.map(i => i.sourceOrderId).filter(Boolean));
+
+    const originalOrders = orders.map(order => {
+      const hasActiveOutgrown = listedOrderIds.has(order.id);
+      const hasActiveReturn = order.returns.length > 0;
+      return {
+        id: order.id,
+        product: order.product,
+        status: order.status,
+        orderedAt: order.orderedAt,
+        source: 'ORIGINAL',
+        hasActiveOutgrown,
+        hasActiveReturn,
+        outgrownEligible: order.status === 'DELIVERED' && !hasActiveReturn && !hasActiveOutgrown,
+      };
+    });
 
     // Marketplace orders (refurbished items bought from ReLoop)
     const marketplaceOrders = await prisma.marketplaceOrder.findMany({

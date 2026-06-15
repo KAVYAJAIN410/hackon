@@ -38,17 +38,26 @@ router.get('/', authenticate, async (req, res) => {
 
     items.forEach(item => {
       const delivery = calculateDeliveryCost(item.currentDcId, buyer.nearestDcId, dcRoutes);
-      const grading = item.return?.finalGrading || item.return?.gradings?.[0] || null;
-      const gradeDiscountPct = grading?.gradeDiscountPct || GRADE_CONFIG[item.grade]?.discountPct || 20;
+      const isOutgrown = item.source === 'OUTGROWN';
+      const returnGrading = item.return?.finalGrading || item.return?.gradings?.[0] || null;
+      const grading = isOutgrown ? (item.gradingData || null) : returnGrading;
+      const gradeDiscountPct = returnGrading?.gradeDiscountPct || GRADE_CONFIG[item.grade]?.discountPct || 20;
 
-      const viability = calculateViability(
-        parseFloat(item.product.mrp),
-        gradeDiscountPct,
-        delivery.totalShipping
-      );
-
-      // Skip non-viable items
-      if (!viability.viable) return;
+      // Price: outgrown uses stored selling price; return items recompute viability
+      let sellingPrice;
+      if (isOutgrown) {
+        sellingPrice = parseFloat(item.sellingPrice);
+        // Outgrown viability: must cover shipping (price already age/grade-adjusted)
+        if (sellingPrice <= delivery.totalShipping) return;
+      } else {
+        const viability = calculateViability(
+          parseFloat(item.product.mrp),
+          gradeDiscountPct,
+          delivery.totalShipping
+        );
+        if (!viability.viable) return; // Skip non-viable
+        sellingPrice = viability.sellingPrice;
+      }
 
       const isNearYou = item.currentDcId === buyer.nearestDcId;
       const productId = item.productId;
@@ -68,10 +77,9 @@ router.get('/', authenticate, async (req, res) => {
           grade,
           gradeLabel: GRADE_CONFIG[grade]?.label || grade,
           discountPct: gradeDiscountPct,
-          sellingPrice: viability.sellingPrice,
+          sellingPrice,
           quantity: 0,
           items: [],
-          // Use the closest/cheapest shipping for this grade
           bestShipping: delivery,
           isNearYou,
         };
@@ -84,11 +92,13 @@ router.get('/', authenticate, async (req, res) => {
         currentDc: item.currentDc,
         shipping: delivery,
         isNearYou,
-        totalPrice: viability.sellingPrice + delivery.totalShipping,
+        source: item.source,
+        ageMonths: item.ageMonths || null,
+        totalPrice: sellingPrice + delivery.totalShipping,
         grading: grading ? {
           grade: grading.grade,
           score: grading.score,
-          confidence: parseFloat(grading.confidence),
+          confidence: typeof grading.confidence === 'number' ? grading.confidence : parseFloat(grading.confidence),
           conditionSummary: grading.conditionSummary,
         } : null,
       });
@@ -110,6 +120,15 @@ router.get('/', authenticate, async (req, res) => {
       // Default to best available grade
       const bestGrade = gradesArray[0];
 
+      // Determine if this product's available stock is from resale (OUTGROWN), returns, or mixed
+      const allSources = gradesArray.flatMap(g => g.items.map(i => i.source));
+      const hasOutgrown = allSources.includes('OUTGROWN');
+      const hasReturn = allSources.includes('RETURN');
+      const listingType = hasOutgrown && !hasReturn ? 'RESOLD'
+        : hasReturn && !hasOutgrown ? 'RETURNED'
+        : 'MIXED';
+      const bestItemAge = bestGrade.items[0]?.ageMonths ?? null;
+
       return {
         productId: entry.productId,
         product: entry.product,
@@ -122,6 +141,13 @@ router.get('/', authenticate, async (req, res) => {
         defaultShipping: bestGrade.bestShipping,
         isNearYou: bestGrade.isNearYou,
         discountPct: bestGrade.discountPct,
+        // Listing type: RESOLD (owner trade-in), RETURNED (return), or MIXED
+        listingType,
+        isResold: listingType === 'RESOLD',
+        ageMonths: bestItemAge,
+        ageLabel: bestItemAge != null
+          ? (bestItemAge < 12 ? `${bestItemAge} mo old` : `${(bestItemAge / 12).toFixed(1)} yr old`)
+          : null,
         // All available grades for this product (like Cashify's Fair/Good/Superb)
         availableGrades: gradesArray.map(g => ({
           grade: g.grade,
@@ -132,6 +158,7 @@ router.get('/', authenticate, async (req, res) => {
           totalPrice: g.sellingPrice + g.bestShipping.totalShipping,
           shipping: g.bestShipping,
           isNearYou: g.isNearYou,
+          source: g.items[0]?.source,
           // First inventory item ID for this grade (for buying)
           inventoryItemId: g.items[0]?.inventoryItemId,
         })),
@@ -203,9 +230,25 @@ router.get('/:id', authenticate, async (req, res) => {
     const gradeMap = {};
     items.forEach(item => {
       const delivery = calculateDeliveryCost(item.currentDcId, buyer.nearestDcId, dcRoutes);
-      const grading = item.return?.finalGrading || item.return?.gradings?.[0] || null;
-      const gradeDiscountPct = grading?.gradeDiscountPct || GRADE_CONFIG[item.grade]?.discountPct || 20;
-      const viability = calculateViability(parseFloat(product.mrp), gradeDiscountPct, delivery.totalShipping);
+      const isOutgrown = item.source === 'OUTGROWN';
+
+      // Grading source: outgrown items store it as JSON on the inventory item;
+      // return items use the final/individual grading on the return record.
+      const returnGrading = item.return?.finalGrading || item.return?.gradings?.[0] || null;
+      const outgrownGrading = item.gradingData || null;
+      const grading = isOutgrown ? outgrownGrading : returnGrading;
+
+      const gradeDiscountPct = returnGrading?.gradeDiscountPct || GRADE_CONFIG[item.grade]?.discountPct || 20;
+
+      // Price: outgrown uses the stored sellingPrice; return items recompute via viability
+      let sellingPrice;
+      if (isOutgrown) {
+        sellingPrice = parseFloat(item.sellingPrice);
+      } else {
+        const viability = calculateViability(parseFloat(product.mrp), gradeDiscountPct, delivery.totalShipping);
+        sellingPrice = viability.sellingPrice;
+      }
+
       const isNearYou = item.currentDcId === buyer.nearestDcId;
 
       if (!gradeMap[item.grade]) {
@@ -213,7 +256,7 @@ router.get('/:id', authenticate, async (req, res) => {
           grade: item.grade,
           gradeLabel: GRADE_CONFIG[item.grade]?.label || item.grade,
           discountPct: gradeDiscountPct,
-          sellingPrice: viability.sellingPrice,
+          sellingPrice,
           quantity: 0,
           items: [],
         };
@@ -224,19 +267,24 @@ router.get('/:id', authenticate, async (req, res) => {
         inventoryItemId: item.id,
         currentDc: item.currentDc,
         shipping: delivery,
-        totalPrice: viability.sellingPrice + delivery.totalShipping,
+        totalPrice: sellingPrice + delivery.totalShipping,
         isNearYou,
+        source: item.source,
+        ageMonths: item.ageMonths || null,
         grading: grading ? {
-          id: grading.id,
+          id: grading.id || null,
           grade: grading.grade,
           score: grading.score,
-          confidence: parseFloat(grading.confidence),
+          confidence: typeof grading.confidence === 'number' ? grading.confidence : parseFloat(grading.confidence),
           conditionSummary: grading.conditionSummary,
           defectsFound: grading.defectsFound,
           missingParts: grading.missingParts,
           functionalNotes: grading.functionalNotes,
         } : null,
-        images: item.return?.images || [],
+        // Outgrown: health images stored on inventory item. Return: return images.
+        images: isOutgrown
+          ? (item.healthImages || []).map(url => ({ imageUrl: url }))
+          : (item.return?.images || []),
       });
     });
 
@@ -268,6 +316,15 @@ router.get('/:id', authenticate, async (req, res) => {
       // Health card from best item
       grading: bestItem.grading,
       images: bestItem.images,
+      // Resell/outgrown metadata
+      source: bestItem.source,
+      isRefurbished: bestItem.source === 'OUTGROWN' || availableGrades.some(g => g.items.some(i => i.source === 'OUTGROWN' || i.source === 'RETURN')),
+      ageMonths: bestItem.ageMonths,
+      ageLabel: bestItem.ageMonths != null
+        ? (bestItem.ageMonths < 12
+            ? `${bestItem.ageMonths} month${bestItem.ageMonths !== 1 ? 's' : ''} old`
+            : `${(bestItem.ageMonths / 12).toFixed(1)} years old`)
+        : null,
     });
   } catch (error) {
     console.error('Error fetching marketplace item:', error);
