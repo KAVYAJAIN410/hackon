@@ -56,7 +56,8 @@ export default function ReturnFlow() {
     setLoadingOrders(true);
     api.get('/orders')
       .then((data) => {
-        const eligible = data.filter(o => o.status === 'DELIVERED' && !o.hasActiveReturn);
+        // Eligible = backend-computed returnEligible (covers original delivered + refurbished non-pledged)
+        const eligible = data.filter(o => o.returnEligible);
         setOrders(eligible);
         if (eligible.length > 0) setSelectedOrder(eligible[0]);
       })
@@ -421,7 +422,11 @@ export default function ReturnFlow() {
                   <div>
                     <p className="text-xs text-[#565959] uppercase font-bold tracking-wider">Estimated Refund</p>
                     <p className="text-lg font-bold text-[#0F1111]">
-                      ₹{selectedOrder?.product?.mrp ? parseFloat(selectedOrder.product.mrp).toLocaleString() : '—'}
+                      ₹{selectedOrder
+                        ? (selectedOrder.source === 'REFURBISHED'
+                            ? parseFloat(selectedOrder.totalPrice || 0).toLocaleString()
+                            : parseFloat(selectedOrder.product?.mrp || 0).toLocaleString())
+                        : '—'}
                     </p>
                   </div>
                 </div>
