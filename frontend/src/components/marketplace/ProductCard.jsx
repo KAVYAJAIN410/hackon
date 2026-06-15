@@ -7,7 +7,7 @@ import { Card } from '@/components/ui/card';
 export default function ProductCard({ id, title, price, grade, image, baseValue, logisticsCost, savesCO2, isNearYou, estimatedDays, isResold, ageLabel }) {
   const gradeColors = {
     'Grade A+': 'bg-reloop-green text-white',
-    'Grade B': 'bg-surface-variant text-on-surface-variant',
+    'Grade B': 'bg-black/60 backdrop-blur-md text-white',
     'Grade A': 'bg-primary-fixed text-link-blue',
   };
 
