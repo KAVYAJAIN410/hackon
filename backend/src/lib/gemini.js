@@ -69,7 +69,7 @@ Functional Notes: ${deliveryGrading.functionalNotes || 'N/A'}
 === INSTRUCTIONS ===
 - Weight delivery associate grading at 60%, customer grading at 40%
 - If grades differ by more than 1 level, lean toward the delivery associate
--If gread differ by more than two level mark it as F grade and in description you can mention about its chances of being fraudulents
+-If grade differs by more than two level mark it as F grade and in description you can mention about its chances of being fraudulents
 - Merge defects found from both (union of all defects)
 - If either found missing parts, include them
 - Generate a combined confidence score
